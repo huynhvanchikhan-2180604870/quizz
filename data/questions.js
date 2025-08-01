@@ -11,6 +11,7 @@ const questionsData = {
   questions: [
     {
       id: 1,
+      type: "grammar",
       question: "Teddy ______________ of moving closer to the city centre.",
       options: [
         "A. thinks",
@@ -27,6 +28,7 @@ const questionsData = {
     },
     {
       id: 2,
+      type: "grammar",
       question: "We __________ giving you a lift home.",
       options: [
         "A. don't mind",
@@ -43,6 +45,7 @@ const questionsData = {
     },
     {
       id: 3,
+      type: "grammar",
       question: "The Potters ____________ to Dubai at 9:00 tomorrow morning.",
       options: [
         "A. is flying",
@@ -59,6 +62,7 @@ const questionsData = {
     },
     {
       id: 4,
+      type: "grammar",
       question: "__________ is your favorite European city?",
       options: ["A. When", "B. How", "C. Which", "D. Who"],
       correct: 2,
@@ -70,6 +74,7 @@ const questionsData = {
     },
     {
       id: 5,
+      type: "grammar",
       question:
         "__________ much do they charge for a single room with breakfast?",
       options: ["A. How", "B. Who", "C. What", "D. Where"],
@@ -81,6 +86,7 @@ const questionsData = {
     },
     {
       id: 6,
+      type: "grammar",
       question: "__________ is your brother talking to?",
       options: ["A. When", "B. Who", "C. Whose", "D. How"],
       correct: 1,
@@ -91,6 +97,7 @@ const questionsData = {
     },
     {
       id: 7,
+      type: "grammar",
       question:
         "The teacher ____________ believe his excuse for not coming to school yesterday.",
       options: ["A. didn't", "B. don't", "C. used to not", "D. use to"],
@@ -103,6 +110,7 @@ const questionsData = {
     },
     {
       id: 8,
+      type: "grammar",
       question: "Bobby ____________ skinny when he was a child.",
       options: ["A. Was used to", "B. were", "C. used to be", "D. got used"],
       correct: 2,
@@ -114,6 +122,7 @@ const questionsData = {
     },
     {
       id: 9,
+      type: "grammar",
       question:
         "I ____________ to contact Mr. Peterson twice, but didn't find him.",
       options: ["A. tried", "B. tries", "C. used to try", "D. try"],
@@ -126,6 +135,7 @@ const questionsData = {
     },
     {
       id: 10,
+      type: "grammar",
       question:
         "After a couple of days, Sam finally ______________ up early in the morning.",
       options: [
@@ -143,6 +153,7 @@ const questionsData = {
     },
     {
       id: 11,
+      type: "grammar",
       question: "It took him a month to recover ______________ his illness.",
       options: ["A. for", "B. from", "C. of", "D. at"],
       correct: 1,
@@ -154,6 +165,7 @@ const questionsData = {
     },
     {
       id: 12,
+      type: "grammar",
       question: "The book exhibition took ______________ at the Carlton Hotel.",
       options: ["A. part", "B. advantage", "C. it easy", "D. place"],
       correct: 3,
@@ -164,6 +176,7 @@ const questionsData = {
     },
     {
       id: 13,
+      type: "grammar",
       question: "I didn't ______________ Jason to come on time.",
       options: ["A. expect", "B. remember", "C. wait", "D. reminded"],
       correct: 0,
@@ -175,6 +188,7 @@ const questionsData = {
     },
     {
       id: 14,
+      type: "grammar",
       question: "I'm sorry but I can't find it ______________ the map.",
       options: ["A. over", "B. on", "C. between", "D. along"],
       correct: 1,
@@ -186,6 +200,7 @@ const questionsData = {
     },
     {
       id: 15,
+      type: "grammar",
       question:
         "They spent the whole day in Alexandria looking at the ______________.",
       options: ["A. tasks", "B. part", "C. jobs", "D. sights"],
@@ -198,6 +213,7 @@ const questionsData = {
     },
     {
       id: 16,
+      type: "grammar",
       question: "He was lucky to find that ______________ in their law firm.",
       options: ["A. job", "B. work", "C. site", "D. task"],
       correct: 0,
@@ -209,6 +225,7 @@ const questionsData = {
     },
     {
       id: 17,
+      type: "grammar",
       question:
         "I think that these trainers belong ______________ your brother.",
       options: ["A. on", "B. in", "C. to", "D. at"],
@@ -220,6 +237,7 @@ const questionsData = {
     },
     {
       id: 18,
+      type: "grammar",
       question: "They usually take ______________ of what I tell them.",
       options: ["A. their time", "B. part", "C. place", "D. no notice"],
       correct: 3,
@@ -231,6 +249,7 @@ const questionsData = {
     },
     {
       id: 19,
+      type: "grammar",
       question: "We never argue ______________ our teacher.",
       options: ["A. with", "B. at", "C. on", "D. from"],
       correct: 0,
@@ -242,6 +261,7 @@ const questionsData = {
     },
     {
       id: 20,
+      type: "grammar",
       question:
         "This dish is very healthy because it consists ______________ fish and vegetables.",
       options: ["A. on", "B. of", "C. at", "D. with"],
@@ -253,6 +273,7 @@ const questionsData = {
     },
     {
       id: 21,
+      type: "grammar",
       question:
         "Tim ______________ the news, while his son was playing computer games.",
       options: [
@@ -270,6 +291,7 @@ const questionsData = {
     },
     {
       id: 22,
+      type: "grammar",
       question: "Lenny ______________ his old house two months ago.",
       options: ["A. were selling", "B. sells", "C. is selling", "D. sold"],
       correct: 3,
@@ -281,6 +303,7 @@ const questionsData = {
     },
     {
       id: 23,
+      type: "grammar",
       question:
         "He didn't meet Joe and Alf, because they left ______________ than they usually do.",
       options: ["A. early", "B. earlier", "C. earliest", "D. the earliest"],
@@ -293,6 +316,7 @@ const questionsData = {
     },
     {
       id: 24,
+      type: "grammar",
       question: "__________ you finish your report on time?",
       options: ["A. Was", "B. Are", "C. Did", "D. Were"],
       correct: 2,
@@ -304,6 +328,7 @@ const questionsData = {
     },
     {
       id: 25,
+      type: "grammar",
       question:
         "I was resting all day yesterday, because I was ______________ tired.",
       options: [
@@ -320,6 +345,7 @@ const questionsData = {
     },
     {
       id: 26,
+      type: "grammar",
       question:
         "Robert was crossing the street when he ______________ Fred riding a motorcycle.",
       options: ["A. saw", "B. was seeing", "C. seeing", "D. is seeing"],
@@ -332,6 +358,7 @@ const questionsData = {
     },
     {
       id: 27,
+      type: "grammar",
       question:
         "This artist is ______________ famous of all three that you mentioned.",
       options: ["A. the less", "B. least", "C. less", "D. the least"],
@@ -344,6 +371,7 @@ const questionsData = {
     },
     {
       id: 28,
+      type: "grammar",
       question: "That's the boy ______________ father is our teacher.",
       options: ["A. who", "B. which", "C. whose", "D. that"],
       correct: 2,
@@ -354,6 +382,7 @@ const questionsData = {
     },
     {
       id: 29,
+      type: "grammar",
       question: "Can you tell me ______________ to put these boxes?",
       options: ["A. where", "B. when", "C. which", "D. who"],
       correct: 0,
@@ -364,6 +393,7 @@ const questionsData = {
     },
     {
       id: 30,
+      type: "grammar",
       question: "Mark, ______________ is only twenty, teaches French.",
       options: ["A. which", "B. who", "C. when", "D. whose"],
       correct: 1,
@@ -374,6 +404,7 @@ const questionsData = {
     },
     {
       id: 31,
+      type: "grammar",
       question: "My doctor advised me to ______________ a sport.",
       options: ["A. take off", "B. take after", "C. take up", "D. take on"],
       correct: 2,
@@ -385,6 +416,7 @@ const questionsData = {
     },
     {
       id: 32,
+      type: "grammar",
       question: "I can't believe that they ______________ your offer.",
       options: [
         "A. turned on",
@@ -401,6 +433,7 @@ const questionsData = {
     },
     {
       id: 33,
+      type: "grammar",
       question: "When I suggested a walk in the woods, he ______________.",
       options: ["A. credited", "B. nodded", "C. raised", "D. shook"],
       correct: 1,
@@ -412,6 +445,7 @@ const questionsData = {
     },
     {
       id: 34,
+      type: "grammar",
       question: "After his mother's ______________, he moved to Argentina.",
       options: ["A. death", "B. strength", "C. power", "D. impression"],
       correct: 0,
@@ -423,6 +457,7 @@ const questionsData = {
     },
     {
       id: 35,
+      type: "grammar",
       question:
         "It was really ______________ that nobody was hurt in that accident.",
       options: ["A. strong", "B. powerful", "C. incredible", "D. truthful"],
@@ -435,6 +470,7 @@ const questionsData = {
     },
     {
       id: 36,
+      type: "grammar",
       question: "Both my children are afraid ______________ the dark.",
       options: ["A. of", "B. for", "C. on", "D. with"],
       correct: 0,
@@ -445,6 +481,7 @@ const questionsData = {
     },
     {
       id: 37,
+      type: "grammar",
       question:
         "They did everything in their ______________ to keep the company.",
       options: ["A. truth", "B. strength", "C. impression", "D. power"],
@@ -457,6 +494,7 @@ const questionsData = {
     },
     {
       id: 38,
+      type: "grammar",
       question: "I bought a leather bag that ______________ my new boots.",
       options: ["A. match", "B. matches", "C. suits", "D. suit"],
       correct: 1,
@@ -468,6 +506,7 @@ const questionsData = {
     },
     {
       id: 39,
+      type: "grammar",
       question: "Both her children have a very vivid ______________.",
       options: [
         "A. description",
@@ -484,6 +523,7 @@ const questionsData = {
     },
     {
       id: 40,
+      type: "grammar",
       question: "I've got the ______________ that they're lying again.",
       options: [
         "A. impression",
@@ -500,6 +540,7 @@ const questionsData = {
     },
     {
       id: 41,
+      type: "grammar",
       question: "The Carltons have never ______________ Denmark before.",
       options: ["A. been to", "B. gone to", "C. gone in", "D. been at"],
       correct: 0,
@@ -511,6 +552,7 @@ const questionsData = {
     },
     {
       id: 42,
+      type: "grammar",
       question: "Have you ______________ thought of studying abroad?",
       options: ["A. since", "B. before", "C. never", "D. ever"],
       correct: 3,
@@ -522,6 +564,7 @@ const questionsData = {
     },
     {
       id: 43,
+      type: "grammar",
       question: "Danny ______________ tennis since he was a child.",
       options: [
         "A. played",
@@ -538,6 +581,7 @@ const questionsData = {
     },
     {
       id: 44,
+      type: "grammar",
       question:
         "It has been raining heavily ______________ our plane took off two hours ago.",
       options: ["A. while", "B. already", "C. since", "D. still"],
@@ -550,6 +594,7 @@ const questionsData = {
     },
     {
       id: 45,
+      type: "grammar",
       question: "Mr. Marfin ______________ go on business trip very often.",
       options: ["A. need", "B. needs", "C. doesn't have", "D. has to"],
       correct: 3,
@@ -561,6 +606,7 @@ const questionsData = {
     },
     {
       id: 46,
+      type: "grammar",
       question: "We can't meet Jack today. We ______________ to work overtime.",
       options: ["A. have", "B. must", "C. had better", "D. would rather"],
       correct: 0,
@@ -572,6 +618,7 @@ const questionsData = {
     },
     {
       id: 47,
+      type: "grammar",
       question: "I'd ______________ join you for dinner than stay at home.",
       options: ["A. rather", "B. had better", "C. need", "D. must"],
       correct: 0,
@@ -583,6 +630,7 @@ const questionsData = {
     },
     {
       id: 48,
+      type: "grammar",
       question:
         "Luckily, we ______________ wait for them. We can leave right now.",
       options: [
@@ -599,6 +647,7 @@ const questionsData = {
     },
     {
       id: 49,
+      type: "grammar",
       question:
         "She ______________ still be at home. I talked to her on the phone a couple of minutes ago.",
       options: ["A. has to", "B. better", "C. must", "D. needs"],
@@ -611,6 +660,7 @@ const questionsData = {
     },
     {
       id: 50,
+      type: "grammar",
       question:
         "I ______________ see an optician. I can't see very clearly lately.",
       options: [
@@ -628,6 +678,7 @@ const questionsData = {
     },
     {
       id: 51,
+      type: "grammar",
       question:
         "My brother came ______________ the flu last week and hasn't recovered yet.",
       options: ["A. across", "B. apart", "C. up with", "D. down with"],
@@ -639,6 +690,7 @@ const questionsData = {
     },
     {
       id: 52,
+      type: "grammar",
       question:
         "Why don't you ask Felix? He always comes ______________ great ideas.",
       options: ["A. off", "B. up with", "C. down with", "D. apart"],
@@ -651,6 +703,7 @@ const questionsData = {
     },
     {
       id: 53,
+      type: "grammar",
       question: "They haven't cleaned their attic ______________.",
       options: [
         "A. for ages",
@@ -666,6 +719,7 @@ const questionsData = {
     },
     {
       id: 54,
+      type: "grammar",
       question:
         "I really had no intention ______________ insulting your father.",
       options: ["A. of", "B. for", "C. on", "D. at"],
@@ -678,6 +732,7 @@ const questionsData = {
     },
     {
       id: 55,
+      type: "grammar",
       question:
         "They aren't interested ______________ buying Steve's country house.",
       options: ["A. to", "B. on", "C. in", "D. for"],
@@ -689,6 +744,7 @@ const questionsData = {
     },
     {
       id: 56,
+      type: "grammar",
       question: "We must ______________ into consideration everything he said.",
       options: ["A. regard", "B. give", "C. think", "D. take"],
       correct: 3,
@@ -700,6 +756,7 @@ const questionsData = {
     },
     {
       id: 57,
+      type: "grammar",
       question: "We're looking ______________ seeing our grandparents.",
       options: ["A. after", "B. out", "C. over", "D. forward to"],
       correct: 3,
@@ -711,6 +768,7 @@ const questionsData = {
     },
     {
       id: 58,
+      type: "grammar",
       question:
         "Brad ______________ his best to please his guests yesterday evening.",
       options: ["A. took", "B. did", "C. brought", "D. made"],
@@ -723,6 +781,7 @@ const questionsData = {
     },
     {
       id: 59,
+      type: "grammar",
       question: "Eating more fruit and vegetables will do you ______________.",
       options: ["A. badly", "B. well", "C. good", "D. best"],
       correct: 2,
@@ -734,6 +793,7 @@ const questionsData = {
     },
     {
       id: 60,
+      type: "grammar",
       question:
         "I'm afraid that the new sales representative doesn't ______________ the manager.",
       options: [
@@ -751,6 +811,7 @@ const questionsData = {
     },
     {
       id: 61,
+      type: "grammar",
       question: "At this time tomorrow, Gerry ______________ his driving test.",
       options: [
         "A. shall take",
@@ -767,6 +828,7 @@ const questionsData = {
     },
     {
       id: 62,
+      type: "grammar",
       question:
         "Henry ______________ a shower as soon as he finishes cleaning his room.",
       options: ["A. will have had", "B. will have", "C. have", "D. is having"],
@@ -779,6 +841,7 @@ const questionsData = {
     },
     {
       id: 63,
+      type: "grammar",
       question: "Will you ______________ painting the house by tomorrow?",
       options: [
         "A. finished",
@@ -795,6 +858,7 @@ const questionsData = {
     },
     {
       id: 64,
+      type: "grammar",
       question:
         "Those cars are going really fast. There ______________ an accident.",
       options: [
@@ -812,6 +876,7 @@ const questionsData = {
     },
     {
       id: 65,
+      type: "grammar",
       question:
         "They could take better pictures if they ______________ a digital camera.",
       options: [
@@ -829,6 +894,7 @@ const questionsData = {
     },
     {
       id: 66,
+      type: "grammar",
       question: "If I ______________ by the sea, I would go fishing every day.",
       options: ["A. lived", "B. would live", "C. live", "D. will be living"],
       correct: 0,
@@ -840,6 +906,7 @@ const questionsData = {
     },
     {
       id: 67,
+      type: "grammar",
       question: "Could I have ______________ more apple juice, please?",
       options: ["A. no", "B. some", "C. any", "D. many"],
       correct: 1,
@@ -851,6 +918,7 @@ const questionsData = {
     },
     {
       id: 68,
+      type: "grammar",
       question:
         "I can't drink this tea. There's too ______________ sugar in it.",
       options: ["A. much", "B. plenty", "C. many", "D. lot of"],
@@ -862,6 +930,7 @@ const questionsData = {
     },
     {
       id: 69,
+      type: "grammar",
       question:
         "How ______________ teachers were there at the seminar yesterday?",
       options: ["A. some", "B. many", "C. any", "D. much"],
@@ -873,6 +942,7 @@ const questionsData = {
     },
     {
       id: 70,
+      type: "grammar",
       question:
         "Don't leave. There are ______________ more things I want to tell you.",
       options: ["A. few", "B. any", "C. little", "D. a few"],
@@ -885,6 +955,7 @@ const questionsData = {
     },
     {
       id: 71,
+      type: "grammar",
       question:
         "He finished my portrait yesterday, but he's putting ______________ at the moment.",
       options: [
@@ -902,6 +973,7 @@ const questionsData = {
     },
     {
       id: 72,
+      type: "grammar",
       question:
         "Do you think you could put ______________ with the head teacher?",
       options: [
@@ -919,6 +991,7 @@ const questionsData = {
     },
     {
       id: 73,
+      type: "grammar",
       question: "I finally ______________ trying to make him change his mind.",
       options: ["A. gave up", "B. gave out", "C. gave back", "D. gave off"],
       correct: 0,
@@ -930,6 +1003,7 @@ const questionsData = {
     },
     {
       id: 74,
+      type: "grammar",
       question: "They told me to ______________ these leaflets.",
       options: ["A. give off", "B. give out", "C. give up", "D. give in to"],
       correct: 1,
@@ -941,6 +1015,7 @@ const questionsData = {
     },
     {
       id: 75,
+      type: "grammar",
       question:
         "They ______________ the meeting because the chairman had to leave.",
       options: ["A. showed off", "B. paid off", "C. got off", "D. put off"],
@@ -953,6 +1028,7 @@ const questionsData = {
     },
     {
       id: 76,
+      type: "grammar",
       question: "Andy loves ______________ his brand-new sports car.",
       options: [
         "A. giving off",
@@ -969,6 +1045,7 @@ const questionsData = {
     },
     {
       id: 77,
+      type: "grammar",
       question:
         "I broke my leg as I was ______________ the bus yesterday morning.",
       options: [
@@ -986,6 +1063,7 @@ const questionsData = {
     },
     {
       id: 78,
+      type: "grammar",
       question:
         "According ______________ Ned, that's the best Chinese restaurant in the city.",
       options: ["A. of", "B. in", "C. at", "D. to"],
@@ -998,6 +1076,7 @@ const questionsData = {
     },
     {
       id: 79,
+      type: "grammar",
       question:
         "Unfortunately, he didn't succeed ______________ getting the job after all.",
       options: ["A. in", "B. on", "C. for", "D. at"],
@@ -1010,6 +1089,7 @@ const questionsData = {
     },
     {
       id: 80,
+      type: "grammar",
       question: "Matt worked so hard that he finally made ______________.",
       options: [
         "A. a haste",
@@ -1026,6 +1106,7 @@ const questionsData = {
     },
     {
       id: 81,
+      type: "grammar",
       question: "Andrew managed ______________ a promotion.",
       options: ["A. in getting", "B. to get", "C. getting", "D. get"],
       correct: 1,
@@ -1036,6 +1117,7 @@ const questionsData = {
     },
     {
       id: 82,
+      type: "grammar",
       question: "I'd rather ______________ with my cousin for the weekend.",
       options: ["A. stay", "B. to stay", "C. staying", "D. to staying"],
       correct: 0,
@@ -1047,6 +1129,7 @@ const questionsData = {
     },
     {
       id: 83,
+      type: "grammar",
       question:
         "They suggested ______________ the children to the new aquarium.",
       options: ["A. to take", "B. in taking", "C. taking", "D. to taking"],
@@ -1058,6 +1141,7 @@ const questionsData = {
     },
     {
       id: 84,
+      type: "grammar",
       question: "Don't forget ______________ off the computer when you finish.",
       options: ["A. turning", "B. to turning", "C. turn", "D. to turn"],
       correct: 3,
@@ -1069,6 +1153,7 @@ const questionsData = {
     },
     {
       id: 85,
+      type: "grammar",
       question:
         "I'm sorry but I don't really feel like ______________ them tonight.",
       options: ["A. seeing", "B. to see", "C. see", "D. to seeing"],
@@ -1080,6 +1165,7 @@ const questionsData = {
     },
     {
       id: 86,
+      type: "grammar",
       question: "Charles ______________ his car washed for two months.",
       options: [
         "A. hadn't been",
@@ -1096,6 +1182,7 @@ const questionsData = {
     },
     {
       id: 87,
+      type: "grammar",
       question: "Could I ______________ by fax, please?",
       options: [
         "A. have been sent",
@@ -1112,21 +1199,7 @@ const questionsData = {
     },
     {
       id: 88,
-      question: "You ______________ checked the report twice.",
-      options: [
-        "A. should have been",
-        "B. could",
-        "C. should have",
-        "D. could have been",
-      ],
-      correct: 2, // C. should have
-      explanation:
-        "'Should have + past participle' expresses a past obligation or advice that was not followed.",
-      category: "Modals",
-      difficulty: "medium",
-    },
-    {
-      id: 88,
+      type: "grammar",
       question: "We ______________ the report typed by Monday.",
       options: [
         "A. will have",
@@ -1143,6 +1216,7 @@ const questionsData = {
     },
     {
       id: 89,
+      type: "grammar",
       question:
         "They ______________ come back from the shopping centre by now.",
       options: [
@@ -1160,6 +1234,7 @@ const questionsData = {
     },
     {
       id: 90,
+      type: "grammar",
       question:
         "I'm not sure, but I think he ______________ used your coffee mug.",
       options: [
@@ -1177,6 +1252,7 @@ const questionsData = {
     },
     {
       id: 91,
+      type: "grammar",
       question: "I was cooking and talking on the phone ______________.",
       options: [
         "A. at once",
@@ -1193,6 +1269,7 @@ const questionsData = {
     },
     {
       id: 92,
+      type: "grammar",
       question: "They're having a lesson ______________.",
       options: [
         "A. at random",
@@ -1209,6 +1286,7 @@ const questionsData = {
     },
     {
       id: 93,
+      type: "grammar",
       question: "______________ of six, he wanted to become an astronaut.",
       options: [
         "A. At a glance",
@@ -1225,6 +1303,7 @@ const questionsData = {
     },
     {
       id: 94,
+      type: "grammar",
       question:
         "The headmaster told them to go to their classroom ______________.",
       options: [
@@ -1241,6 +1320,7 @@ const questionsData = {
     },
     {
       id: 95,
+      type: "grammar",
       question:
         "I'm really sorry, but I didn't have ______________ that your mother was so seriously ill.",
       options: [
@@ -1258,6 +1338,7 @@ const questionsData = {
     },
     {
       id: 96,
+      type: "grammar",
       question:
         "The chief editor had ______________ at the whole magazine before it was printed.",
       options: [
@@ -1275,6 +1356,7 @@ const questionsData = {
     },
     {
       id: 97,
+      type: "grammar",
       question:
         "I'm sure that he had ______________ leaving you here all by yourself.",
       options: [
@@ -1292,6 +1374,7 @@ const questionsData = {
     },
     {
       id: 98,
+      type: "grammar",
       question:
         "Unfortunately, they had a big ______________ their supervisor yesterday morning.",
       options: [
@@ -1309,6 +1392,7 @@ const questionsData = {
     },
     {
       id: 99,
+      type: "grammar",
       question: "Gregory never ______________ what his mother tells him.",
       options: [
         "A. informs",
@@ -1325,6 +1409,7 @@ const questionsData = {
     },
     {
       id: 100,
+      type: "grammar",
       question: "Mona's teacher ______________ her from taking the exams.",
       options: ["A. informed", "B. discouraged", "C. waited", "D. made"],
       correct: 1,

@@ -1,7 +1,13 @@
 // Quiz App Logic
 class QuizApp {
   constructor() {
-    this.allQuestions = []; // Tất cả câu hỏi
+    this.currentExerciseType = null; // 'grammar' hoặc 'transformation'
+    this.allQuestions = []; // Tất cả câu hỏi của loại hiện tại
+    this.grammarQuestions = [];
+    this.sentenceQuestions = [];
+    this.speakingTopics = [];
+    this.writingTopics = [];
+    this.listeningTests = [];
     this.questions = []; // Câu hỏi của bài đang chọn
     this.currentQuestionIndex = 0;
     this.userAnswers = [];
@@ -10,6 +16,7 @@ class QuizApp {
     this.timerInterval = null;
     this.isAnswered = false;
     this.currentLessonId = null;
+    this.currentAudio = null;
     this.autoNext = false;
     this.init();
   }
@@ -17,18 +24,18 @@ class QuizApp {
   // Khởi tạo ứng dụng
   async init() {
     try {
-      // Load tất cả câu hỏi
-      this.allQuestions = questionsData.questions;
-
-      // Hiện màn hình chọn bài, ẩn các màn hình khác
-      document.getElementById("lessonSelectScreen").style.display = "block";
-      document.getElementById("startScreen").style.display = "none";
-      document.getElementById("questionScreen").style.display = "none";
-      document.getElementById("resultScreen").style.display = "none";
-      document.getElementById("reviewScreen").style.display = "none";
-
-      // Đảm bảo quiz info bị ẩn khi khởi động
+      // Load cả 2 loại data
+      this.grammarQuestions = questionsData.questions;
+      this.sentenceQuestions = sentenceData.questions;
+      this.speakingTopics = speakingData.topics;
+      this.writingTopics = writingData.topics;
+      this.listeningTests = listeningData.tests;
+      // Hiện màn hình chọn dạng bài
+      this.showScreen("exerciseTypeScreen");
+      this.hideHeaderAndProgress();
+      // Ẩn quiz info ban đầu
       document.querySelector(".container").classList.add("hide-quiz-info");
+
       document
         .getElementById("autoNextCheckbox")
         .addEventListener("change", (e) => {
@@ -36,39 +43,90 @@ class QuizApp {
         });
 
       this.setupEventListeners();
-      console.log(
-        "Quiz app initialized with",
-        this.allQuestions.length,
-        "total questions"
-      );
+      console.log("Quiz app initialized");
     } catch (error) {
       console.error("Error loading questions:", error);
     }
   }
 
-  selectLesson(lessonId) {
-    this.currentLessonId = lessonId;
-    const startIndex = (lessonId - 1) * 25;
-    const endIndex = startIndex + 25;
+  hideHeaderAndProgress() {
+    document.querySelector(".header").style.display = "none";
+    document.querySelector(".progress-container").style.display = "none";
+  }
 
-    // Lấy 25 câu hỏi cho bài được chọn
-    this.questions = this.allQuestions.slice(startIndex, endIndex);
+  showHeaderAndProgress() {
+    document.querySelector(".header").style.display = "block";
+    document.querySelector(".progress-container").style.display = "block";
+  }
 
-    // Hiển thị quiz info và progress bar
-    document.querySelector(".container").classList.remove("hide-quiz-info");
+  // Chọn dạng bài tập
+  selectExerciseType(type) {
+    this.currentExerciseType = type;
 
-    // Cập nhật tiêu đề
+    if (type === "grammar") {
+      this.allQuestions = this.grammarQuestions;
+      this.setupGrammarLessons();
+    } else if (type === "transformation") {
+      this.allQuestions = this.sentenceQuestions;
+      this.setupTransformationLessons();
+    } else if (type === "speaking") {
+      this.allQuestions = this.speakingTopics;
+      this.setupSpeakingTopics();
+    } else if (type === "writing") {
+      this.allQuestions = this.writingTopics;
+      this.setupWritingTopics();
+    } else if (type === "listening") {
+      this.allQuestions = this.listeningTests;
+      this.setupListeningTests();
+    }
+
+    this.hideHeaderAndProgress();
+    this.showScreen("lessonSelectScreen");
+  }
+
+  setupListeningTests() {
+    const lessonGrid = document.getElementById("lessonGrid");
+    const lessonTitle = document.getElementById("lessonTitle");
+
+    lessonTitle.textContent = "🎧 Listening Practice - Chọn bài test";
+    lessonGrid.innerHTML = "";
+
+    this.listeningTests.forEach((test) => {
+      const lessonBtn = document.createElement("button");
+      lessonBtn.className = "lesson-btn";
+      lessonBtn.onclick = () => this.selectListeningTest(test.id);
+      lessonBtn.innerHTML = `
+      <span class="lesson-number">${test.icon} Test ${test.id}</span>
+      <span class="lesson-range">${test.questions.length} câu hỏi</span>
+    `;
+      lessonGrid.appendChild(lessonBtn);
+    });
+  }
+
+  selectListeningTest(testId) {
+    const test = this.listeningTests.find((t) => t.id === testId);
+    if (!test) return;
+
+    this.questions = test.questions;
+    this.currentTest = test;
+    this.currentExerciseType = "listening"; // Đảm bảo set đúng type
+
     document.querySelector(
       ".header-content h1"
-    ).textContent = `🎓 Bài ${lessonId} (Câu ${startIndex + 1}-${endIndex})`;
+    ).textContent = `🎧 ${test.title}`;
 
-    // Ẩn màn hình chọn bài, hiện màn hình start
-    document.getElementById("lessonSelectScreen").style.display = "none";
-    document.getElementById("startScreen").style.display = "block";
+    document.getElementById(
+      "welcomeText"
+    ).innerHTML = `Bạn sẽ nghe và trả lời ${test.questions.length} câu hỏi.<br>
+     Có thể nghe lại nhiều lần. Chọn đáp án đúng nhất.`;
+
+    // Hiện header cho Listening
+    this.showHeaderAndProgress();
+    this.showScreen("startScreen");
 
     // Reset các giá trị
     this.currentQuestionIndex = 0;
-    this.userAnswers = new Array(25).fill(null);
+    this.userAnswers = new Array(this.questions.length).fill(null);
     this.currentScore = 0;
     this.isAnswered = false;
 
@@ -78,9 +136,291 @@ class QuizApp {
     document.getElementById("currentScore").textContent = "0";
   }
 
+  // Cập nhật loadListeningQuestion để quản lý audio
+  loadListeningQuestion(question) {
+    const questionText = document.getElementById("questionText");
+    const optionsContainer = document.getElementById("optionsContainer");
+
+    // Dừng audio cũ nếu có
+    this.stopCurrentAudio();
+
+    // Thêm audio player nếu có
+    let audioHtml = "";
+    if (this.currentTest && this.currentTest.audioUrl) {
+      audioHtml = `
+      <div class="audio-player">
+        <audio controls id="listeningAudio">
+          <source src="${this.currentTest.audioUrl}" type="audio/mpeg">
+          Trình duyệt không hỗ trợ audio.
+        </audio>
+        <p class="audio-note">💡 Bạn có thể nghe lại nhiều lần</p>
+      </div>
+    `;
+    }
+
+    questionText.innerHTML = audioHtml + question.question;
+
+    // Lưu reference đến audio element
+    setTimeout(() => {
+      this.currentAudio = document.getElementById("listeningAudio");
+    }, 100);
+
+    this.createOptions(question);
+  }
+
+  stopCurrentAudio() {
+    if (this.currentAudio) {
+      this.currentAudio.pause();
+      this.currentAudio.currentTime = 0;
+      this.currentAudio = null;
+    }
+
+    // Dừng tất cả audio elements trên trang (backup)
+    const allAudios = document.querySelectorAll("audio");
+    allAudios.forEach((audio) => {
+      audio.pause();
+      audio.currentTime = 0;
+    });
+  }
+
+  setupWritingTopics() {
+    const lessonGrid = document.getElementById("lessonGrid");
+    const lessonTitle = document.getElementById("lessonTitle");
+    this.hideHeaderAndProgress();
+    lessonTitle.textContent = "✍️ Writing Practice - Chọn chủ đề";
+    lessonGrid.innerHTML = "";
+
+    this.writingTopics.forEach((topic) => {
+      const lessonBtn = document.createElement("button");
+      lessonBtn.className = "lesson-btn";
+      lessonBtn.onclick = () => this.selectWritingTopic(topic.id);
+      lessonBtn.innerHTML = `
+            <span class="lesson-number">${topic.icon} Topic ${topic.id}</span>
+            <span class="lesson-range">${topic.title}</span>
+        `;
+      lessonGrid.appendChild(lessonBtn);
+    });
+  }
+
+  selectWritingTopic(topicId) {
+    const topic = this.writingTopics.find((t) => t.id === topicId);
+    if (!topic) return;
+
+    this.hideHeaderAndProgress();
+    this.showScreen("writingScreen");
+    this.loadWritingTopic(topic);
+  }
+
+  loadWritingTopic(topic) {
+    const writingTitle = document.getElementById("writingTitle");
+    const writingBody = document.getElementById("writingBody");
+
+    writingTitle.innerHTML = `${topic.icon} Topic ${topic.id}`;
+
+    writingBody.innerHTML = `
+        <div class="writing-prompt">
+            <h3>📝 Đề bài:</h3>
+            <div class="prompt-english">${topic.prompt}</div>
+            <div class="prompt-vietnamese" style="display: none;">${topic.promptVietnamese}</div>
+            <button class="toggle-translation" onclick="togglePromptTranslation()">
+                🔄 Xem bản dịch
+            </button>
+        </div>
+        
+        <div class="sample-letter">
+            <h3>✉️ Bài mẫu:</h3>
+            <div class="letter-english">${topic.sampleLetter}</div>
+            <div class="letter-vietnamese" style="display: none;">${topic.vietnameseTranslation}</div>
+            <button class="toggle-translation" onclick="toggleLetterTranslation()">
+                🔄 Xem bản dịch
+            </button>
+        </div>
+    `;
+  }
+
+  setupSpeakingTopics() {
+    const lessonGrid = document.getElementById("lessonGrid");
+    const lessonTitle = document.getElementById("lessonTitle");
+
+    lessonTitle.textContent = "🎤 Speaking Practice - Chọn chủ đề";
+    lessonGrid.innerHTML = "";
+
+    this.speakingTopics.forEach((topic, index) => {
+      const lessonBtn = document.createElement("button");
+      lessonBtn.className = "lesson-btn";
+      lessonBtn.onclick = () => this.selectSpeakingTopic(topic.id);
+      lessonBtn.innerHTML = `
+      <span class="lesson-number">${topic.icon} Topic ${topic.id}</span>
+      <span class="lesson-range">${topic.title}</span>
+    `;
+      lessonGrid.appendChild(lessonBtn);
+    });
+  }
+
+  selectSpeakingTopic(topicId) {
+    const topic = this.speakingTopics.find((t) => t.id === topicId);
+    if (!topic) return;
+
+    // Ẩn header và progress cho speaking
+    document.querySelector(".header").style.display = "none";
+    document.querySelector(".progress-container").style.display = "none";
+    this.hideHeaderAndProgress();
+    this.showScreen("speakingScreen");
+    this.loadSpeakingTopic(topic);
+  }
+
+  loadSpeakingTopic(topic) {
+    const speakingTitle = document.getElementById("speakingTitle");
+    const speakingBody = document.getElementById("speakingBody");
+
+    speakingTitle.innerHTML = `${topic.icon} Topic ${topic.id}`;
+
+    let content = `
+    <div class="topic-title">
+      ${topic.title}
+    </div>
+  `;
+
+    topic.questions.forEach((qa, index) => {
+      content += `
+      <div class="qa-item">
+        <div class="question">
+          <span class="question-number">${index + 1}</span>
+          <span>${qa.question}</span>
+        </div>
+        <div class="answer">${qa.answer}</div>
+      </div>
+    `;
+    });
+
+    speakingBody.innerHTML = content;
+  }
+
+  // Setup bài học Grammar (4 bài x 25 câu)
+  setupGrammarLessons() {
+    const lessonGrid = document.getElementById("lessonGrid");
+    const lessonTitle = document.getElementById("lessonTitle");
+
+    lessonTitle.textContent = "📝 Grammar Quiz - Chọn bài học";
+    lessonGrid.innerHTML = "";
+
+    for (let i = 1; i <= 4; i++) {
+      const startIndex = (i - 1) * 25 + 1;
+      const endIndex = i * 25;
+
+      const lessonBtn = document.createElement("button");
+      lessonBtn.className = "lesson-btn";
+      lessonBtn.onclick = () => this.selectLesson(i);
+      lessonBtn.innerHTML = `
+        <span class="lesson-number">Bài ${i}</span>
+        <span class="lesson-range">Câu ${startIndex}-${endIndex}</span>
+      `;
+      lessonGrid.appendChild(lessonBtn);
+    }
+  }
+
+  // Setup bài học Transformation (5 bài x 5 câu)
+  setupTransformationLessons() {
+    const lessonGrid = document.getElementById("lessonGrid");
+    const lessonTitle = document.getElementById("lessonTitle");
+
+    lessonTitle.textContent = "🔄 Sentence Transformation - Chọn bài học";
+    lessonGrid.innerHTML = "";
+
+    for (let i = 1; i <= 5; i++) {
+      const startIndex = 72 + (i - 1) * 5 + 1; // 73, 78, 83, 88, 93
+      const endIndex = startIndex + 4; // 77, 82, 87, 92, 97
+
+      const lessonBtn = document.createElement("button");
+      lessonBtn.className = "lesson-btn";
+      lessonBtn.onclick = () => this.selectLesson(i);
+      lessonBtn.innerHTML = `
+        <span class="lesson-number">Bài ${i}</span>
+        <span class="lesson-range">Câu ${startIndex}-${endIndex}</span>
+      `;
+      lessonGrid.appendChild(lessonBtn);
+    }
+  }
+
+  // Chọn bài học
+  selectLesson(lessonId) {
+    this.currentLessonId = lessonId;
+
+    if (this.currentExerciseType === "grammar") {
+      const startIndex = (lessonId - 1) * 25;
+      const endIndex = startIndex + 25;
+      this.questions = this.allQuestions.slice(startIndex, endIndex);
+
+      document.querySelector(
+        ".header-content h1"
+      ).textContent = `📝 Grammar - Bài ${lessonId} (Câu ${
+        startIndex + 1
+      }-${endIndex})`;
+
+      document.getElementById(
+        "welcomeText"
+      ).innerHTML = `Bạn sẽ trả lời 25 câu hỏi trắc nghiệm với 4 lựa chọn A, B, C, D.<br>
+       Điểm số sẽ được cập nhật ngay khi bạn chọn đáp án.`;
+
+      // Hiện header cho Grammar
+      this.showHeaderAndProgress();
+    } else if (this.currentExerciseType === "transformation") {
+      const startIndex = (lessonId - 1) * 5;
+      const endIndex = startIndex + 5;
+      this.questions = this.allQuestions.slice(startIndex, endIndex);
+
+      const questionStart = 73 + startIndex;
+      const questionEnd = questionStart + 4;
+
+      document.querySelector(
+        ".header-content h1"
+      ).textContent = `🔄 Transformation - Bài ${lessonId} (Câu ${questionStart}-${questionEnd})`;
+
+      document.getElementById(
+        "welcomeText"
+      ).innerHTML = `Bạn sẽ làm 5 câu chuyển đổi câu.<br>
+       Nhập đáp án vào ô trống để hoàn thành câu.`;
+
+      // Hiện header cho Transformation
+      this.showHeaderAndProgress();
+    }
+
+    // Ẩn màn hình chọn bài, hiện màn hình start
+    this.showScreen("startScreen");
+
+    // Reset các giá trị
+    this.currentQuestionIndex = 0;
+    this.userAnswers = new Array(this.questions.length).fill(null);
+    this.currentScore = 0;
+    this.isAnswered = false;
+
+    // Cập nhật UI
+    this.updateTotalQuestions();
+    document.getElementById("elapsedTime").textContent = "00:00";
+    document.getElementById("currentScore").textContent = "0";
+  }
+
+  // Hiển thị màn hình
+  showScreen(screenId) {
+    const screens = [
+      "exerciseTypeScreen",
+      "lessonSelectScreen",
+      "startScreen",
+      "questionScreen",
+      "resultScreen",
+      "reviewScreen",
+      "speakingScreen",
+      "writingScreen",
+    ];
+    screens.forEach((id) => {
+      document.getElementById(id).style.display =
+        id === screenId ? "block" : "none";
+    });
+  }
+
   // Quay lại chọn bài
   backToLessons() {
-    // Xóa timer nếu đang chạy
+    this.stopCurrentAudio();
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
     }
@@ -94,27 +434,32 @@ class QuizApp {
     this.startTime = null;
     this.isAnswered = false;
 
-    // Ẩn quiz info và progress bar
-    document.querySelector(".container").classList.add("hide-quiz-info");
+    // Ẩn header cho tất cả loại bài tập khi quay về màn hình chọn bài
+    this.hideHeaderAndProgress();
 
     // Reset tiêu đề
     document.querySelector(".header-content h1").textContent =
       "🎓 Quiz Trắc Nghiệm";
 
-    // Ẩn các màn hình khác, hiện màn hình chọn bài
-    document.getElementById("startScreen").style.display = "none";
-    document.getElementById("questionScreen").style.display = "none";
-    document.getElementById("resultScreen").style.display = "none";
-    document.getElementById("reviewScreen").style.display = "none";
-    document.getElementById("lessonSelectScreen").style.display = "block";
+    // Hiện màn hình chọn bài
+    this.showScreen("lessonSelectScreen");
 
     // Reset progress
     document.getElementById("progressFill").style.width = "0%";
-    document.getElementById("progressText").textContent = "0/25";
+    document.getElementById("progressText").textContent = "0/0";
     document.getElementById("elapsedTime").textContent = "00:00";
     document.getElementById("autoNextCheckbox").checked = false;
     this.autoNext = false;
     this.updateScore();
+  }
+
+  // Quay lại chọn dạng bài
+  backToExerciseTypes() {
+    this.currentExerciseType = null;
+    this.hideHeaderAndProgress();
+    this.showScreen("exerciseTypeScreen");
+    document.querySelector(".header-content h1").textContent =
+      "🎓 Quiz Trắc Nghiệm";
   }
 
   // Cập nhật tổng số câu hỏi
@@ -145,7 +490,6 @@ class QuizApp {
       const diffX = touchStartX - touchEndX;
       const diffY = Math.abs(touchStartY - touchEndY);
 
-      // Chỉ xử lý swipe ngang nếu không phải scroll dọc
       if (Math.abs(diffX) > 50 && diffY < 100) {
         if (diffX > 0 && !document.getElementById("nextBtn").disabled) {
           this.nextQuestion();
@@ -159,27 +503,32 @@ class QuizApp {
   // Xử lý phím tắt
   handleKeyPress(e) {
     if (document.getElementById("questionScreen").style.display !== "none") {
+      if (this.currentExerciseType === "grammar") {
+        switch (e.key) {
+          case "1":
+          case "a":
+          case "A":
+            this.selectOption(0);
+            break;
+          case "2":
+          case "b":
+          case "B":
+            this.selectOption(1);
+            break;
+          case "3":
+          case "c":
+          case "C":
+            this.selectOption(2);
+            break;
+          case "4":
+          case "d":
+          case "D":
+            this.selectOption(3);
+            break;
+        }
+      }
+
       switch (e.key) {
-        case "1":
-        case "a":
-        case "A":
-          this.selectOption(0);
-          break;
-        case "2":
-        case "b":
-        case "B":
-          this.selectOption(1);
-          break;
-        case "3":
-        case "c":
-        case "C":
-          this.selectOption(2);
-          break;
-        case "4":
-        case "d":
-        case "D":
-          this.selectOption(3);
-          break;
         case "ArrowLeft":
           e.preventDefault();
           this.previousQuestion();
@@ -205,11 +554,7 @@ class QuizApp {
     this.startTime = new Date();
     this.isAnswered = false;
 
-    // Ẩn start screen, hiện question screen
-    document.getElementById("startScreen").style.display = "none";
-    document.getElementById("questionScreen").style.display = "block";
-
-    // Bắt đầu timer
+    this.showScreen("questionScreen");
     this.startTimer();
     this.loadQuestion();
     this.updateScore();
@@ -240,8 +585,7 @@ class QuizApp {
     questionScreen.style.transform = "translateY(10px)";
 
     setTimeout(() => {
-      // Cập nhật nội dung câu hỏi
-      document.getElementById("questionText").textContent = question.question;
+      // Cập nhật số câu hỏi
       document.getElementById("currentQuestion").textContent =
         this.currentQuestionIndex + 1;
 
@@ -253,8 +597,14 @@ class QuizApp {
         this.currentQuestionIndex + 1
       }/${this.questions.length}`;
 
-      // Tạo options
-      this.createOptions(question);
+      // Tạo nội dung câu hỏi theo loại
+      if (this.currentExerciseType === "listening") {
+        this.loadListeningQuestion(question);
+      } else if (this.currentExerciseType === "grammar") {
+        this.loadGrammarQuestion(question);
+      } else {
+        this.loadTransformationQuestion(question);
+      }
 
       // Cập nhật status nếu đã trả lời
       this.updateQuestionStatus();
@@ -271,7 +621,91 @@ class QuizApp {
     }, 150);
   }
 
-  // Tạo các lựa chọn
+  loadListeningQuestion(question) {
+    const questionText = document.getElementById("questionText");
+    const optionsContainer = document.getElementById("optionsContainer");
+
+    // Thêm audio player nếu có
+    let audioHtml = "";
+    if (this.currentTest && this.currentTest.audioUrl) {
+      audioHtml = `
+      <div class="audio-player">
+        <audio controls>
+          <source src="${this.currentTest.audioUrl}" type="audio/mpeg">
+          Trình duyệt không hỗ trợ audio.
+        </audio>
+        <p class="audio-note">💡 Bạn có thể nghe lại nhiều lần</p>
+      </div>
+    `;
+    }
+
+    questionText.innerHTML = audioHtml + question.question;
+    this.createOptions(question);
+  }
+
+  // Load câu hỏi Grammar
+  loadGrammarQuestion(question) {
+    document.getElementById("questionText").textContent = question.question;
+    this.createOptions(question);
+  }
+
+  // Load câu hỏi Transformation
+  loadTransformationQuestion(question) {
+    const questionText = document.getElementById("questionText");
+    const optionsContainer = document.getElementById("optionsContainer");
+
+    questionText.innerHTML = `<strong>Câu gốc:</strong> ${question.question}`;
+
+    optionsContainer.innerHTML = `
+      <div class="transformation-container">
+        <div class="transformation-input">
+          <span class="transformation-start">${
+            question.transformationStart
+          }</span>
+          <textarea class="answer-input" id="transformationInput" 
+          placeholder="nhập đáp án vào đây..." 
+          rows="2"
+          ${this.isAnswered ? "disabled" : ""}></textarea>
+
+          <button class="submit-btn" id="submitBtn" onclick="quizApp.submitTransformation()" 
+                  ${this.isAnswered ? "disabled" : ""}>
+            Kiểm tra
+          </button>
+        </div>
+      </div>
+    `;
+
+    // Nếu đã trả lời, hiển thị đáp án
+    if (this.isAnswered) {
+      const input = document.getElementById("transformationInput");
+      const userAnswer = this.userAnswers[this.currentQuestionIndex];
+      input.value = userAnswer;
+
+      const isCorrect = this.checkTransformationAnswer(
+        userAnswer,
+        question.correctAnswer
+      );
+      input.classList.add(isCorrect ? "correct" : "incorrect");
+    }
+    // Auto-resize textarea
+    setTimeout(() => {
+      const textarea = document.getElementById("transformationInput");
+      if (textarea) {
+        textarea.addEventListener("input", function () {
+          this.style.height = "auto";
+          this.style.height = Math.min(this.scrollHeight, 120) + "px";
+        });
+
+        // Set initial height if there's existing content
+        if (textarea.value) {
+          textarea.style.height = "auto";
+          textarea.style.height = Math.min(textarea.scrollHeight, 120) + "px";
+        }
+      }
+    }, 100);
+  }
+
+  // Tạo các lựa chọn cho Grammar
   createOptions(question) {
     const optionsContainer = document.getElementById("optionsContainer");
     optionsContainer.innerHTML = "";
@@ -297,50 +731,37 @@ class QuizApp {
       }
 
       optionDiv.innerHTML = `
-                <div class="option-letter">${String.fromCharCode(
-                  65 + index
-                )}</div>
-                <div class="option-text">${option}</div>
-            `;
+        <div class="option-letter">${String.fromCharCode(65 + index)}</div>
+        <div class="option-text">${option}</div>
+      `;
 
       if (!this.isAnswered) {
         optionDiv.onclick = () => this.selectOption(index);
       }
 
-      // Add animation delay
-      optionDiv.style.animationDelay = `${index * 0.1}s`;
-      optionDiv.classList.add("option-animate");
-
       optionsContainer.appendChild(optionDiv);
     });
   }
 
-  // Chọn lựa chọn
+  // Chọn lựa chọn (Grammar)
   selectOption(optionIndex) {
     if (this.isAnswered) return;
 
     const question = this.questions[this.currentQuestionIndex];
-
-    // Lưu đáp án
     this.userAnswers[this.currentQuestionIndex] = optionIndex;
     this.isAnswered = true;
 
-    // Cập nhật điểm số ngay lập tức
     const isCorrect = optionIndex === question.correct;
     if (isCorrect) {
       this.currentScore++;
     }
 
-    // Hiển thị feedback
-    this.showFeedback(isCorrect, question.explanation);
-
-    // Cập nhật UI
+    this.showFeedback(isCorrect, question.explanation, question.tip);
     this.updateOptionsAfterAnswer(optionIndex, question.correct);
     this.updateScore();
     this.updateQuestionStatus();
     this.updateNavigationButtons();
 
-    // Chỉ tự động chuyển câu nếu checkbox được chọn
     if (
       this.autoNext &&
       this.currentQuestionIndex < this.questions.length - 1
@@ -349,11 +770,76 @@ class QuizApp {
         this.nextQuestion();
       }, 1500);
     } else if (this.currentQuestionIndex === this.questions.length - 1) {
-      // Highlight finish button nếu là câu cuối
       setTimeout(() => {
         document.getElementById("finishBtn").classList.add("pulse");
       }, 1000);
     }
+  }
+
+  // Submit transformation answer
+  submitTransformation() {
+    if (this.isAnswered) return;
+
+    const input = document.getElementById("transformationInput");
+    const userAnswer = input.value.trim();
+
+    if (!userAnswer) {
+      alert("Vui lòng nhập đáp án!");
+      return;
+    }
+
+    const question = this.questions[this.currentQuestionIndex];
+    this.userAnswers[this.currentQuestionIndex] = userAnswer;
+    this.isAnswered = true;
+
+    const isCorrect = this.checkTransformationAnswer(
+      userAnswer,
+      question.correctAnswer
+    );
+    if (isCorrect) {
+      this.currentScore++;
+    }
+
+    // Update UI
+    input.disabled = true;
+    input.classList.add(isCorrect ? "correct" : "incorrect");
+    document.getElementById("submitBtn").disabled = true;
+
+    this.showFeedback(isCorrect, question.explanation, question.tip);
+    this.updateScore();
+    this.updateQuestionStatus();
+    this.updateNavigationButtons();
+
+    if (
+      this.autoNext &&
+      this.currentQuestionIndex < this.questions.length - 1
+    ) {
+      setTimeout(() => {
+        this.nextQuestion();
+      }, 1500);
+    } else if (this.currentQuestionIndex === this.questions.length - 1) {
+      setTimeout(() => {
+        document.getElementById("finishBtn").classList.add("pulse");
+      }, 1000);
+    }
+  }
+
+  // Kiểm tra đáp án transformation
+  checkTransformationAnswer(userAnswer, correctAnswer) {
+    // Normalize answers (remove extra spaces, convert to lowercase)
+    const normalizeAnswer = (answer) => {
+      return answer
+        .toLowerCase()
+        .replace(/[.,!?;:"']/g, "") // Remove punctuation
+        .replace(/\s+/g, " ") // Replace multiple spaces with single space
+        .trim();
+    };
+
+    const normalizedUser = normalizeAnswer(userAnswer);
+    const normalizedCorrect = normalizeAnswer(correctAnswer);
+
+    // Check if answers match (allowing for minor variations)
+    return normalizedUser === normalizedCorrect;
   }
 
   // Cập nhật options sau khi trả lời
@@ -382,36 +868,32 @@ class QuizApp {
   }
 
   // Hiển thị feedback
-  // Cập nhật phương thức showFeedback trong class QuizApp
-  showFeedback(isCorrect, explanation) {
+  showFeedback(isCorrect, explanation, tip) {
     const feedback = document.getElementById("answerFeedback");
     const feedbackContent = feedback.querySelector(".feedback-content");
     const tipContent = feedback.querySelector(".tip-content");
-    const question = this.questions[this.currentQuestionIndex];
 
     feedback.className = `answer-feedback ${
       isCorrect ? "correct" : "incorrect"
     }`;
 
-    // Hiển thị feedback
     feedbackContent.innerHTML = `
-        <div class="feedback-icon">${isCorrect ? "🎉" : "😞"}</div>
-        <div class="feedback-text">
-            <strong>${isCorrect ? "Chính xác!" : "Chưa đúng!"}</strong>
-            ${
-              explanation
-                ? `<br><span class="explanation">${explanation}</span>`
-                : ""
-            }
-        </div>
+      <div class="feedback-icon">${isCorrect ? "🎉" : "😞"}</div>
+      <div class="feedback-text">
+        <strong>${isCorrect ? "Chính xác!" : "Chưa đúng!"}</strong>
+        ${
+          explanation
+            ? `<br><span class="explanation">${explanation}</span>`
+            : ""
+        }
+      </div>
     `;
 
-    // Hiển thị tip nếu có
-    if (question.tip) {
+    if (tip) {
       tipContent.innerHTML = `
-            <div class="tip-icon">💡</div>
-            <div class="tip-text">${question.tip}</div>
-        `;
+        <div class="tip-icon">💡</div>
+        <div class="tip-text">${tip}</div>
+      `;
       tipContent.style.display = "flex";
     } else {
       tipContent.style.display = "none";
@@ -428,7 +910,16 @@ class QuizApp {
 
     if (userAnswer !== null) {
       const question = this.questions[this.currentQuestionIndex];
-      const isCorrect = userAnswer === question.correct;
+      let isCorrect;
+
+      if (this.currentExerciseType === "grammar") {
+        isCorrect = userAnswer === question.correct;
+      } else {
+        isCorrect = this.checkTransformationAnswer(
+          userAnswer,
+          question.correctAnswer
+        );
+      }
 
       status.className = `question-status ${
         isCorrect ? "correct" : "incorrect"
@@ -451,10 +942,8 @@ class QuizApp {
     const nextBtn = document.getElementById("nextBtn");
     const finishBtn = document.getElementById("finishBtn");
 
-    // Previous button
     prevBtn.disabled = this.currentQuestionIndex === 0;
 
-    // Next/Finish button
     if (this.currentQuestionIndex === this.questions.length - 1) {
       nextBtn.style.display = "none";
       finishBtn.style.display = "flex";
@@ -483,42 +972,63 @@ class QuizApp {
 
   // Hoàn thành quiz
   finishQuiz() {
+    this.stopCurrentAudio();
     clearInterval(this.timerInterval);
     this.showResults();
   }
 
   // Hiển thị kết quả
   showResults() {
-    document.getElementById("questionScreen").style.display = "none";
-    document.getElementById("resultScreen").style.display = "block";
+    this.showScreen("resultScreen");
 
-    // Tính toán kết quả
     let correctCount = 0;
+    let answeredCount = 0;
+
+    // Đảm bảo userAnswers có đủ length
+    while (this.userAnswers.length < this.questions.length) {
+      this.userAnswers.push(null);
+    }
+
     this.userAnswers.forEach((answer, index) => {
-      if (answer === this.questions[index].correct) {
-        correctCount++;
+      if (answer !== null && answer !== undefined) {
+        answeredCount++;
+        const question = this.questions[index];
+        let isCorrect;
+
+        if (
+          this.currentExerciseType === "grammar" ||
+          this.currentExerciseType === "listening"
+        ) {
+          isCorrect = answer === question.correct;
+        } else {
+          isCorrect = this.checkTransformationAnswer(
+            answer,
+            question.correctAnswer
+          );
+        }
+
+        if (isCorrect) {
+          correctCount++;
+        }
       }
     });
 
     const percentage = Math.round((correctCount / this.questions.length) * 100);
-    const wrongCount = this.questions.length - correctCount;
-    const skippedCount = this.userAnswers.filter(
-      (answer) => answer === -1
-    ).length;
+    const wrongCount = answeredCount - correctCount;
+    const skippedCount = this.questions.length - answeredCount;
 
-    // Cập nhật UI kết quả với animation
+    // Cập nhật UI kết quả
     setTimeout(() => {
       document.getElementById("scorePercentage").textContent = percentage + "%";
     }, 500);
 
     setTimeout(() => {
       document.getElementById("correctAnswers").textContent = correctCount;
-      document.getElementById("wrongAnswers").textContent = wrongCount;
+      let wrongText = wrongCount.toString();
       if (skippedCount > 0) {
-        document.getElementById(
-          "wrongAnswers"
-        ).textContent += ` (${skippedCount} câu bỏ qua)`;
+        wrongText += ` (${skippedCount} câu bỏ qua)`;
       }
+      document.getElementById("wrongAnswers").textContent = wrongText;
     }, 800);
 
     // Cập nhật thời gian tổng
@@ -533,14 +1043,13 @@ class QuizApp {
         .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
     }, 1100);
 
-    // Animate score ring
     this.animateScoreRing(percentage);
   }
 
   // Animate score ring
   animateScoreRing(percentage) {
     const ring = document.getElementById("scoreRing");
-    const circumference = 2 * Math.PI * 90; // r = 90
+    const circumference = 2 * Math.PI * 90;
     const offset = circumference - (percentage / 100) * circumference;
 
     ring.style.strokeDasharray = circumference;
@@ -551,20 +1060,19 @@ class QuizApp {
         "stroke-dashoffset 2s cubic-bezier(0.4, 0, 0.2, 1)";
       ring.style.strokeDashoffset = offset;
 
-      // Change color based on score
       if (percentage >= 80) {
-        ring.style.stroke = "#10b981"; // green
+        ring.style.stroke = "#10b981";
       } else if (percentage >= 60) {
-        ring.style.stroke = "#f59e0b"; // yellow
+        ring.style.stroke = "#f59e0b";
       } else {
-        ring.style.stroke = "#ef4444"; // red
+        ring.style.stroke = "#ef4444";
       }
     }, 800);
   }
 
   // Làm lại quiz
   restartQuiz() {
-    // Reset tất cả
+    this.stopCurrentAudio();
     this.currentQuestionIndex = 0;
     this.userAnswers = [];
     this.currentScore = 0;
@@ -575,12 +1083,8 @@ class QuizApp {
       clearInterval(this.timerInterval);
     }
 
-    // Reset UI
-    document.getElementById("resultScreen").style.display = "none";
-    document.getElementById("reviewScreen").style.display = "none";
-    document.getElementById("startScreen").style.display = "block";
+    this.showScreen("startScreen");
 
-    // Reset progress
     document.getElementById("progressFill").style.width = "0%";
     document.getElementById(
       "progressText"
@@ -594,31 +1098,28 @@ class QuizApp {
 
   // Xem lại đáp án
   reviewAnswers() {
-    document.getElementById("resultScreen").style.display = "none";
-    document.getElementById("reviewScreen").style.display = "block";
+    this.showScreen("reviewScreen");
     this.createReviewContent();
   }
 
+  // Kết thúc sớm
   endEarly() {
     const modal = document.getElementById("confirmModal");
     modal.classList.add("show");
   }
 
   confirmEndEarly() {
-    // Đánh dấu các câu chưa trả lời là sai
-    this.userAnswers = this.userAnswers.map((answer) =>
-      answer === null ? -1 : answer
-    );
+    this.stopCurrentAudio();
+    // Đảm bảo userAnswers có đủ length cho tất cả câu hỏi
+    while (this.userAnswers.length < this.questions.length) {
+      this.userAnswers.push(null);
+    }
 
-    // Dừng timer
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
     }
 
-    // Đóng modal
     closeConfirmModal();
-
-    // Hiển thị kết quả
     this.showResults();
   }
 
@@ -627,75 +1128,53 @@ class QuizApp {
     const container = document.getElementById("reviewContainer");
     container.innerHTML = "";
 
+    // Đảm bảo userAnswers có đủ length
+    while (this.userAnswers.length < this.questions.length) {
+      this.userAnswers.push(null);
+    }
+
     this.questions.forEach((question, index) => {
       const userAnswer = this.userAnswers[index];
-      const isCorrect = userAnswer === question.correct;
+      let isCorrect = false;
+
+      if (userAnswer !== null && userAnswer !== undefined) {
+        if (
+          this.currentExerciseType === "grammar" ||
+          this.currentExerciseType === "listening"
+        ) {
+          isCorrect = userAnswer === question.correct;
+        } else {
+          isCorrect = this.checkTransformationAnswer(
+            userAnswer,
+            question.correctAnswer
+          );
+        }
+      }
 
       const reviewItem = document.createElement("div");
       reviewItem.className = `review-item ${
         isCorrect ? "correct" : "incorrect"
       }`;
 
-      reviewItem.innerHTML = `
-            <div class="review-question">
-                <strong>Câu ${index + 1}:</strong> ${question.question}
-            </div>
-            <div class="review-options">
-                ${question.options
-                  .map((option, optIndex) => {
-                    let className = "review-option";
-                    let icon = "";
+      if (
+        this.currentExerciseType === "grammar" ||
+        this.currentExerciseType === "listening"
+      ) {
+        reviewItem.innerHTML = this.createGrammarReview(
+          question,
+          index,
+          userAnswer,
+          isCorrect
+        );
+      } else {
+        reviewItem.innerHTML = this.createTransformationReview(
+          question,
+          index,
+          userAnswer,
+          isCorrect
+        );
+      }
 
-                    if (optIndex === question.correct) {
-                      className += " correct-answer";
-                      icon = "✅ ";
-                    }
-                    if (optIndex === userAnswer) {
-                      if (userAnswer === question.correct) {
-                        className += " user-correct";
-                      } else {
-                        className += " user-answer";
-                        icon = "❌ ";
-                      }
-                    }
-
-                    return `
-                        <div class="${className}">
-                            <strong>${String.fromCharCode(
-                              65 + optIndex
-                            )}.</strong>
-                            ${icon}${option}
-                        </div>
-                    `;
-                  })
-                  .join("")}
-            </div>
-            <div class="review-result ${isCorrect ? "correct" : "incorrect"}">
-                ${isCorrect ? "✅ Đúng" : "❌ Sai"}
-            </div>
-            <div class="review-feedback">
-                ${
-                  question.explanation
-                    ? `
-                    <div class="review-explanation">
-                        <strong>💡 Giải thích:</strong> ${question.explanation}
-                    </div>
-                `
-                    : ""
-                }
-                ${
-                  question.tip
-                    ? `
-                    <div class="review-tip">
-                        <strong>✨ Mẹo:</strong> ${question.tip}
-                    </div>
-                `
-                    : ""
-                }
-            </div>
-        `;
-
-      // Add animation delay
       reviewItem.style.animationDelay = `${index * 0.05}s`;
       reviewItem.classList.add("review-animate");
 
@@ -703,15 +1182,143 @@ class QuizApp {
     });
   }
 
+  // Tạo review cho Grammar
+  createGrammarReview(question, index, userAnswer, isCorrect) {
+    return `
+    <div class="review-question">
+      <strong>Câu ${index + 1}:</strong> ${question.question}
+    </div>
+    <div class="review-options">
+      ${question.options
+        .map((option, optIndex) => {
+          let className = "review-option";
+          let icon = "";
+
+          if (optIndex === question.correct) {
+            className += " correct-answer";
+            icon = "✅ ";
+          }
+          if (
+            userAnswer !== null &&
+            userAnswer !== undefined &&
+            optIndex === userAnswer
+          ) {
+            if (userAnswer === question.correct) {
+              className += " user-correct";
+            } else {
+              className += " user-answer";
+              icon = "❌ ";
+            }
+          }
+
+          return `
+          <div class="${className}">
+            <strong>${String.fromCharCode(65 + optIndex)}.</strong>
+            ${icon}${option}
+          </div>
+        `;
+        })
+        .join("")}
+    </div>
+    <div class="review-result ${isCorrect ? "correct" : "incorrect"}">
+      ${
+        userAnswer !== null && userAnswer !== undefined
+          ? isCorrect
+            ? "✅ Đúng"
+            : "❌ Sai"
+          : "⚪ Chưa trả lời"
+      }
+    </div>
+    <div class="review-feedback">
+      ${
+        question.explanation
+          ? `
+        <div class="review-explanation">
+          <strong>💡 Giải thích:</strong> ${question.explanation}
+        </div>
+      `
+          : ""
+      }
+      ${
+        question.tip
+          ? `
+        <div class="review-tip">
+          <strong>✨ Mẹo:</strong> ${question.tip}
+        </div>
+      `
+          : ""
+      }
+    </div>
+  `;
+  }
+
+  // Tạo review cho Transformation
+  createTransformationReview(question, index, userAnswer, isCorrect) {
+    const hasAnswer = userAnswer !== null && userAnswer !== undefined;
+    const userAnswerText = hasAnswer ? userAnswer : "(Chưa trả lời)";
+    const userAnswerClass = hasAnswer
+      ? isCorrect
+        ? "user-correct"
+        : "user-answer"
+      : "";
+
+    return `
+    <div class="review-question">
+      <strong>Câu ${index + 1}:</strong> ${question.question}
+    </div>
+    <div class="review-options">
+      <div class="review-option">
+        <strong>Bắt đầu:</strong> ${question.transformationStart}
+      </div>
+      <div class="review-option ${userAnswerClass}">
+        <strong>Bạn trả lời:</strong> ${userAnswerText}
+      </div>
+      <div class="review-option correct-answer">
+        <strong>Đáp án đúng:</strong> ${question.correctAnswer}
+      </div>
+      <div class="review-option">
+        <strong>Câu hoàn chỉnh:</strong> ${question.fullCorrectSentence}
+      </div>
+    </div>
+    <div class="review-result ${isCorrect ? "correct" : "incorrect"}">
+      ${hasAnswer ? (isCorrect ? "✅ Đúng" : "❌ Sai") : "⚪ Chưa trả lời"}
+    </div>
+    <div class="review-feedback">
+      ${
+        question.explanation
+          ? `
+        <div class="review-explanation">
+          <strong>💡 Giải thích:</strong> ${question.explanation}
+        </div>
+      `
+          : ""
+      }
+      ${
+        question.tip
+          ? `
+        <div class="review-tip">
+          <strong>✨ Mẹo:</strong> ${question.tip}
+        </div>
+      `
+          : ""
+      }
+    </div>
+  `;
+  }
+
   // Quay lại kết quả
   backToResults() {
-    document.getElementById("reviewScreen").style.display = "none";
-    document.getElementById("resultScreen").style.display = "block";
+    this.stopCurrentAudio();
+    this.showScreen("resultScreen");
   }
 }
 
 // Global functions for HTML onclick events
 let quizApp;
+
+function selectExerciseType(type) {
+  quizApp.selectExerciseType(type);
+}
 
 function selectLesson(lessonId) {
   quizApp.selectLesson(lessonId);
@@ -728,6 +1335,10 @@ function confirmEndEarly() {
 
 function backToLessons() {
   quizApp.backToLessons();
+}
+
+function backToExerciseTypes() {
+  quizApp.backToExerciseTypes();
 }
 
 function startQuiz() {
@@ -760,6 +1371,39 @@ function backToResults() {
 
 function endEarly() {
   quizApp.endEarly();
+}
+
+// Global functions for translation toggle
+function togglePromptTranslation() {
+  const english = document.querySelector(".prompt-english");
+  const vietnamese = document.querySelector(".prompt-vietnamese");
+  const button = document.querySelector(".writing-prompt .toggle-translation");
+
+  if (vietnamese.style.display === "none") {
+    english.style.display = "none";
+    vietnamese.style.display = "block";
+    button.textContent = "🔄 Xem tiếng Anh";
+  } else {
+    english.style.display = "block";
+    vietnamese.style.display = "none";
+    button.textContent = "🔄 Xem bản dịch";
+  }
+}
+
+function toggleLetterTranslation() {
+  const english = document.querySelector(".letter-english");
+  const vietnamese = document.querySelector(".letter-vietnamese");
+  const button = document.querySelector(".sample-letter .toggle-translation");
+
+  if (vietnamese.style.display === "none") {
+    english.style.display = "none";
+    vietnamese.style.display = "block";
+    button.textContent = "🔄 Xem tiếng Anh";
+  } else {
+    english.style.display = "block";
+    vietnamese.style.display = "none";
+    button.textContent = "🔄 Xem bản dịch";
+  }
 }
 
 // Khởi tạo app khi DOM loaded

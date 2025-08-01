@@ -4,69 +4,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Trắc Nghiệm</title>
+    <title>Quiz Trắc Nghiệm Tiếng Anh</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
-    <div class="container hide-quiz-info">
+    <div class="container">
         <!-- Header -->
-        <div class="header glass-morphism">
+        <div class="header">
             <div class="header-content">
-                <h1><span class="icon icon-animate">🎓</span> Quiz Trắc Nghiệm</h1>
+                <h1>🎓 Quiz Trắc Nghiệm</h1>
                 <div class="quiz-info">
-                    <div class="info-item glass-morphism">
-                        <span class="icon icon-animate">📊</span>
-                        <span>Tổng: <span id="totalQuestions">25</span> câu</span>
+                    <div class="info-item">
+                        <span class="icon">📊</span>
+                        <span>Điểm: <span id="currentScore">0</span>/<span id="maxScore">25</span></span>
                     </div>
-                    <div class="info-item glass-morphism">
-                        <span class="icon icon-animate">⏱️</span>
+                    <div class="info-item">
+                        <span class="icon">⏱️</span>
                         <span>Thời gian: <span id="elapsedTime">00:00</span></span>
                     </div>
-                    <div class="info-item glass-morphism">
-                        <span class="icon icon-animate">🎯</span>
-                        <span>Điểm: <span id="currentScore">0</span>/<span id="maxScore">25</span></span>
+                    <div class="info-item">
+                        <span class="icon">📝</span>
+                        <span>Tổng: <span id="totalQuestions">25</span> câu</span>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Progress Bar -->
-        <div class="progress-container glass-morphism">
+        <div class="progress-container">
             <div class="progress-bar">
-                <div id="progressFill" class="progress-fill"></div>
+                <div class="progress-fill" id="progressFill"></div>
             </div>
-            <div class="progress-text">
-                <span id="progressText">0/25</span>
+            <div class="progress-text" id="progressText">0/25</div>
+        </div>
+
+        <!-- Exercise Type Selection Screen -->
+        <div id="exerciseTypeScreen" class="screen" style="display: block;">
+            <div class="exercise-types">
+                <h2>🎯 Chọn dạng bài tập</h2>
+                <div class="type-grid">
+                    <button class="type-btn" onclick="selectExerciseType('grammar')">
+                        <span class="type-icon">📝</span>
+                        <span class="type-title">Grammar Quiz</span>
+                        <span class="type-desc">100 câu trắc nghiệm ngữ pháp</span>
+                    </button>
+                    <button class="type-btn" onclick="selectExerciseType('transformation')">
+                        <span class="type-icon">🔄</span>
+                        <span class="type-title">Sentence Transformation</span>
+                        <span class="type-desc">25 câu chuyển đổi câu</span>
+                    </button>
+                    <button class="type-btn" onclick="selectExerciseType('speaking')">
+                        <span class="type-icon">🎤</span>
+                        <span class="type-title">Speaking Practice</span>
+                        <span class="type-desc">6 chủ đề luyện nói</span>
+                    </button>
+                    <button class="type-btn" onclick="selectExerciseType('writing')">
+                        <span class="type-icon">✍️</span>
+                        <span class="type-title">Writing Practice</span>
+                        <span class="type-desc">2 bài mẫu viết thư</span>
+                    </button>
+                    <button class="type-btn" onclick="selectExerciseType('listening')">
+                        <span class="type-icon">🎧</span>
+                        <span class="type-title">Listening Practice</span>
+                        <span class="type-desc">9 bài test nghe hiểu</span>
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- Lesson Select Screen -->
-        <div id="lessonSelectScreen" class="screen start-screen">
-            <div class="start-content glass-morphism">
-                <div class="welcome-icon icon-animate">📚</div>
-                <h2>Chọn Bài Tập</h2>
-                <p class="welcome-text">
-                    Chọn một trong các bài tập dưới đây để bắt đầu làm bài.<br>
-                    Mỗi bài có 25 câu hỏi trắc nghiệm.
-                </p>
-                <div class="lesson-grid">
-                    <button class="lesson-btn glass-morphism" onclick="selectLesson(1)">
-                        <span class="lesson-number">Bài 1</span>
-                        <span class="lesson-range">Câu 1-25</span>
+        <!-- Lesson Selection Screen -->
+        <div id="lessonSelectScreen" class="screen" style="display: none;">
+            <div class="lesson-selection">
+                <div class="lesson-header">
+                    <button class="btn btn-secondary" onclick="backToExerciseTypes()">
+                        <span class="btn-icon">←</span>
+                        <span class="btn-text">Chọn dạng bài khác</span>
                     </button>
-                    <button class="lesson-btn glass-morphism" onclick="selectLesson(2)">
-                        <span class="lesson-number">Bài 2</span>
-                        <span class="lesson-range">Câu 26-50</span>
-                    </button>
-                    <button class="lesson-btn glass-morphism" onclick="selectLesson(3)">
-                        <span class="lesson-number">Bài 3</span>
-                        <span class="lesson-range">Câu 51-75</span>
-                    </button>
-                    <button class="lesson-btn glass-morphism" onclick="selectLesson(4)">
-                        <span class="lesson-number">Bài 4</span>
-                        <span class="lesson-range">Câu 76-100</span>
-                    </button>
+                    <h2 id="lessonTitle">📚 Chọn bài học</h2>
+                </div>
+                <div class="lesson-grid" id="lessonGrid">
+                    <!-- Lessons sẽ được tạo động -->
                 </div>
             </div>
         </div>
@@ -76,7 +94,7 @@
             <div class="start-content">
                 <div class="welcome-icon">🚀</div>
                 <h2>Sẵn sàng làm bài?</h2>
-                <p class="welcome-text">
+                <p class="welcome-text" id="welcomeText">
                     Bạn sẽ trả lời 25 câu hỏi trắc nghiệm với 4 lựa chọn A, B, C, D.<br>
                     Điểm số sẽ được cập nhật ngay khi bạn chọn đáp án.
                 </p>
@@ -165,12 +183,13 @@
                         <div class="score-percentage" id="scorePercentage">0%</div>
                         <div class="score-label">Kết quả</div>
                     </div>
-                    <svg class="score-ring" width="100" height="100">
+                    <svg class="score-ring" width="200" height="200" viewBox="0 0 200 200">
                         <circle cx="100" cy="100" r="90" fill="none" stroke="#e5e7eb" stroke-width="8" />
                         <circle id="scoreRing" cx="100" cy="100" r="90" fill="none" stroke="#4f46e5" stroke-width="8"
                             stroke-linecap="round" stroke-dasharray="565.48" stroke-dashoffset="565.48" />
                     </svg>
                 </div>
+
 
                 <div class="result-stats">
                     <div class="result-stat correct">
@@ -199,7 +218,7 @@
                         <span class="btn-icon">🔄</span>
                         <span class="btn-text">Làm lại bài này</span>
                     </button>
-                    <button class="btn btn-secondary btn-large" onclick="reviewAnswers()">
+                    <button class="btn btn-review btn-large" onclick="reviewAnswers()">
                         <span class="btn-icon">📋</span>
                         <span class="btn-text">Xem lại đáp án</span>
                     </button>
@@ -212,7 +231,7 @@
             <div class="review-content">
                 <div class="review-header">
                     <h2>📋 Xem lại đáp án</h2>
-                    <button class="btn btn-secondary" onclick="backToResults()">
+                    <button class="btn btn-review btn-large" onclick="backToResults()">
                         <span class="btn-icon">←</span>
                         <span class="btn-text">Quay lại</span>
                     </button>
@@ -223,6 +242,33 @@
             </div>
         </div>
 
+        <div id="speakingScreen" class="screen speaking-screen" style="display: none;">
+            <div class="speaking-content">
+                <div class="speaking-header">
+                    <button class="modal-back-btn" onclick="backToLessons()">
+                        <span class="back-chevron back-speaking">‹</span>
+                    </button>
+                    <h2 id="speakingTitle">🎤 Speaking Practice</h2>
+                </div>
+                <div class="speaking-body" id="speakingBody">
+                    <!-- Content sẽ được tạo động -->
+                </div>
+            </div>
+        </div>
+
+        <div id="writingScreen" class="screen writing-screen" style="display: none;">
+            <div class="writing-content">
+                <div class="writing-header">
+                    <button class="modal-back-btn" onclick="backToLessons()">
+                        <span class="back-chevron back-speaking">‹</span>
+                    </button>
+                    <h2 id="writingTitle">✍️ Writing Practice</h2>
+                </div>
+                <div class="writing-body" id="writingBody">
+                    <!-- Content sẽ được tạo động -->
+                </div>
+            </div>
+        </div>
         <!-- Floating Action Buttons - Chỉ hiển thị trong màn hình review -->
         <div class="floating-actions review-only">
             <button class="fab-button btn-back" onclick="backToLessons()" title="Quay lại chọn bài">
@@ -235,26 +281,37 @@
 
         <!-- Confirm Modal -->
         <div id="confirmModal" class="modal">
+            <div class="modal-backdrop" onclick="closeConfirmModal()"></div>
             <div class="modal-content">
-                <div class="modal-icon">⚠️</div>
-                <h3>Xác nhận kết thúc</h3>
-                <p>Bạn có chắc muốn kết thúc sớm bài làm?<br>Các câu chưa trả lời sẽ bị tính là sai.</p>
-                <div class="modal-actions">
-                    <button class="btn btn-secondary" onclick="closeConfirmModal()">
-                        <span class="btn-icon">←</span>
-                        <span class="btn-text">Tiếp tục làm bài</span>
-                    </button>
-                    <button class="btn btn-warning" onclick="confirmEndEarly()">
-                        <span class="btn-icon">⚡</span>
-                        <span class="btn-text">Kết thúc</span>
-                    </button>
+                <button class="modal-back-btn" onclick="closeConfirmModal()">
+                    <span class="back-chevron">‹</span>
+                </button>
+                <div class="modal-body">
+                    <div class="modal-icon">⚠️</div>
+                    <h3>Xác nhận kết thúc</h3>
+                    <p>Bạn có chắc muốn kết thúc sớm bài làm?<br>Các câu chưa trả lời sẽ bị tính là sai.</p>
+                    <div class="modal-actions">
+                        <button class="btn btn-end-early" id="endEarlyBtn" onclick="confirmEndEarly()">
+                            <span class="btn-icon">⚡</span>
+                            <span class="btn-text">Kết thúc sớm</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
+
     </div>
 
+    <!-- Scripts Data -->
     <script src="data/questions.js"></script>
+    <script src="data/sentences.js"></script>
+    <script src="data/speaking.js"></script>
+    <script src="data/writing.js"></script>
+    <script src="data/listening.js"></script>
+
+     <!-- Scripts Main -->
     <script src="js/script.js"></script>
+
 </body>
 
 </html>
