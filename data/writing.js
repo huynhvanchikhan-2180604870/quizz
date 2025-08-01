@@ -24,35 +24,35 @@ const writingData = {
 • hỏi một số câu hỏi về cuộc sống ở thành phố`,
       sampleLetter: `Dear ........,
 
-I hope you are doing well. I have some exciting news to share with you!
+I hope you are doing well.
 
-I was just offered a job at ........ Company in ........ City. I am really excited about this opportunity, but I am also a little nervous because I have never been to ........ City before.
+I have just got a job offer from ........ Company in ........ City. I’m happy about it, but also a bit nervous because I have never been to that city before.
 
-I am feeling a bit unsure about moving to a new city because I do not know anyone there. I know you have lived in ........ City for a while now, so I was hoping you could answer some questions for me.
+I don’t know anyone there, so I feel a bit worried. Since you live there, I want to ask you some questions.
 
-I am also wondering about the cost of living. Is it expensive to live in ........ City? Are there any good places that you would recommend for me to live? What is the traffic like? And how is the food there?
+Is it expensive to live there? What areas are good to stay in? How is the traffic? Is the food good?
 
-I would really appreciate any advice you can give me about living in the city.
+Your advice would really help me a lot.
 
-I am looking forward to hearing from you soon.
+Hope to hear from you soon.
 
-Best,
+Best,  
 ........`,
       vietnameseTranslation: `Gửi ........,
 
-Tôi hy vọng bạn đang khỏe mạnh. Tôi có tin vui muốn chia sẻ với bạn!
+Tôi hy vọng bạn đang khỏe.
 
-Tôi vừa được mời làm việc tại Công ty ........ ở thành phố ........ Tôi rất hào hứng về cơ hội này, nhưng tôi cũng hơi lo lắng vì tôi chưa bao giờ đến thành phố ........ trước đây.
+Tôi vừa nhận được lời mời làm việc từ Công ty ........ ở thành phố ........ Tôi rất vui, nhưng cũng hơi lo vì tôi chưa từng đến đó.
 
-Tôi cảm thấy hơi không chắc chắn về việc chuyển đến một thành phố mới vì tôi không quen ai ở đó. Tôi biết bạn đã sống ở thành phố ........ được một thời gian rồi, vì vậy tôi hy vọng bạn có thể trả lời một số câu hỏi cho tôi.
+Tôi không quen ai ở đó nên hơi lo lắng. Vì bạn sống ở đó, tôi muốn hỏi bạn vài điều.
 
-Tôi cũng thắc mắc về chi phí sinh hoạt. Sống ở thành phố ........ có đắt không? Có nơi nào tốt mà bạn muốn giới thiệu cho tôi ở không? Giao thông như thế nào? Và đồ ăn ở đó ra sao?
+Sống ở đó có đắt không? Khu nào tốt để ở? Giao thông ra sao? Đồ ăn có ngon không?
 
-Tôi sẽ rất biết ơn nếu bạn có thể cho tôi lời khuyên về việc sống ở thành phố này.
+Lời khuyên của bạn sẽ giúp tôi rất nhiều.
 
-Tôi mong sớm nhận được tin từ bạn.
+Mong sớm nhận được tin từ bạn.
 
-Thân ái,
+Thân ái,  
 ........`,
     },
     {
@@ -72,35 +72,35 @@ Thân ái,
 • nhờ họ giúp tìm chỗ ở nếu bạn được nhận vào khóa học`,
       sampleLetter: `Dear ........,
 
-I hope this email finds you well. I have some exciting news to tell you!
+I hope you are doing great.
 
-I am applying to ........ University in your city for their Business program. This course is perfect for me because it has good teachers and modern facilities. The program is also well-known and will help me get a good job later.
+I’m applying to ........ University in your city. I want to study Business there. The program is famous and has good teachers.
 
-I am passionate about this course and I think this program would be a great way for me to learn more and develop my skills. I have always wanted to study business, and this university has an excellent reputation.
+I really like this subject and hope it can help me get a good job in the future.
 
-However, I need to find somewhere to live if I get accepted. I know you are familiar with the city, so I hope you can give me some advice on finding accommodation. Do you know any good areas for students? Are there any apartments or student houses that you would recommend?
+If I get in, I’ll need a place to live. Can you help me find a place or tell me good areas for students?
 
-I would be so grateful for any help you can offer! It would mean a lot to me.
+Thanks so much for your help.
 
-I am looking forward to hearing from you soon.
+Looking forward to hearing from you.
 
-Best,
+Best,  
 ........`,
       vietnameseTranslation: `Gửi ........,
 
-Tôi hy vọng email này đến với bạn khi bạn đang khỏe mạnh. Tôi có tin vui muốn kể cho bạn nghe!
+Tôi hy vọng bạn đang khỏe.
 
-Tôi đang nộp đơn vào Đại học ........ ở thành phố của bạn cho chương trình Kinh doanh của họ. Khóa học này hoàn hảo cho tôi vì có giáo viên giỏi và cơ sở vật chất hiện đại. Chương trình này cũng nổi tiếng và sẽ giúp tôi có được công việc tốt sau này.
+Tôi đang nộp đơn vào Đại học ........ ở thành phố của bạn. Tôi muốn học ngành Kinh doanh ở đó. Chương trình nổi tiếng và có giáo viên giỏi.
 
-Tôi đam mê khóa học này và tôi nghĩ chương trình này sẽ là cách tuyệt vời để tôi học hỏi thêm và phát triển kỹ năng. Tôi luôn muốn học kinh doanh, và trường đại học này có danh tiếng xuất sắc.
+Tôi rất thích ngành này và hy vọng nó sẽ giúp tôi có công việc tốt sau này.
 
-Tuy nhiên, tôi cần tìm nơi ở nếu được nhận. Tôi biết bạn quen thuộc với thành phố này, vì vậy tôi hy vọng bạn có thể cho tôi lời khuyên về việc tìm chỗ ở. Bạn có biết khu vực nào tốt cho sinh viên không? Có căn hộ hoặc nhà sinh viên nào mà bạn muốn giới thiệu không?
+Nếu tôi được nhận, tôi cần chỗ ở. Bạn có thể giúp tôi tìm hoặc gợi ý khu nào tốt cho sinh viên không?
 
-Tôi sẽ rất biết ơn nếu bạn có thể giúp đỡ! Điều đó có ý nghĩa rất lớn với tôi.
+Cảm ơn bạn rất nhiều vì đã giúp đỡ.
 
-Tôi mong sớm nhận được tin từ bạn.
+Mong sớm nhận được tin từ bạn.
 
-Thân ái,
+Thân ái,  
 ........`,
     },
   ],
