@@ -121,6 +121,30 @@ body {
     gap: 1rem;
 }
 
+.lesson-header .modal-back-btn {
+    background: rgba(71, 42, 42, 0.2);
+    /* màu trắng mờ */
+    backdrop-filter: blur(8px);
+    /* hiệu ứng mờ nền phía sau */
+    -webkit-backdrop-filter: blur(8px);
+    /* cho Safari */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    /* viền trong suốt nhẹ */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    /* đổ bóng nhẹ */
+    border-radius: 50%;
+    /* hình tròn */
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    /* hoặc màu khác tùy nền */
+    cursor: pointer;
+    padding: 10px !important;
+}
+
 .lesson-header h2 {
     margin: 0;
     flex: 1;
@@ -2065,5 +2089,213 @@ body {
         padding: 1rem;
         font-size: 0.9rem;
         max-height: 250px;
+    }
+}
+
+/* Fill in blanks styling */
+.fill-blanks-container {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    padding: 2rem;
+    border-radius: var(--radius-md);
+    margin: 1rem 0;
+    border-left: 4px solid var(--primary-color);
+}
+
+.blanks-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.blank-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.blank-item label {
+    font-weight: 600;
+    color: var(--primary-color);
+    min-width: 30px;
+}
+
+.blank-input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    transition: all var(--transition-normal);
+}
+
+.blank-input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(132, 94, 194, 0.1);
+}
+
+.blank-input.correct {
+    border-color: var(--success-color);
+    background: rgba(0, 194, 168, 0.1);
+}
+
+.blank-input.incorrect {
+    border-color: var(--error-color);
+    background: rgba(255, 128, 102, 0.1);
+}
+
+.blank-input:disabled {
+    opacity: 0.8;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .blanks-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .fill-blanks-container {
+        padding: 1.5rem;
+    }
+}
+
+.submit-center {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.submit-center .submit-btn {
+    min-width: 150px;
+}
+
+/* True/False styling */
+.true-false-container {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    padding: 2rem;
+    border-radius: var(--radius-md);
+    margin: 1rem 0;
+    border-left: 4px solid var(--primary-color);
+}
+
+.question-statement {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.true-false-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.tf-option {
+    position: relative;
+}
+
+.tf-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.tf-label {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    background: white;
+}
+
+.tf-label:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(132, 94, 194, 0.2);
+}
+
+.tf-letter {
+    background: var(--primary-color);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.tf-text {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.tf-option input[type="radio"]:checked+.tf-label {
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+}
+
+.tf-option input[type="radio"]:checked+.tf-label .tf-letter {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.tf-option input[type="radio"]:checked+.tf-label .tf-text {
+    color: white;
+}
+
+.tf-label.correct {
+    border-color: var(--success-color);
+    background: linear-gradient(135deg, var(--success-color), #059669);
+    color: white;
+}
+
+.tf-label.incorrect {
+    border-color: var(--error-color);
+    background: linear-gradient(135deg, var(--error-color), #dc2626);
+    color: white;
+}
+
+.tf-label.show-correct {
+    border-color: var(--success-color);
+    background: linear-gradient(135deg, var(--success-color), #059669);
+    color: white;
+    opacity: 0.8;
+}
+
+.tf-label.correct .tf-letter,
+.tf-label.incorrect .tf-letter,
+.tf-label.show-correct .tf-letter {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.tf-label.correct .tf-text,
+.tf-label.incorrect .tf-text,
+.tf-label.show-correct .tf-text {
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .true-false-options {
+        grid-template-columns: 1fr;
+    }
+
+    .true-false-container {
+        padding: 1.5rem;
+    }
+
+    .question-statement {
+        font-size: 1rem;
     }
 }

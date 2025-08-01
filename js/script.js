@@ -109,7 +109,7 @@ class QuizApp {
 
     this.questions = test.questions;
     this.currentTest = test;
-    this.currentExerciseType = "listening"; // Đảm bảo set đúng type
+    this.currentExerciseType = "listening";
 
     document.querySelector(
       ".header-content h1"
@@ -120,8 +120,13 @@ class QuizApp {
     ).innerHTML = `Bạn sẽ nghe và trả lời ${test.questions.length} câu hỏi.<br>
      Có thể nghe lại nhiều lần. Chọn đáp án đúng nhất.`;
 
-    // Hiện header cho Listening
-    this.showHeaderAndProgress();
+    // Ẩn header cho Test 17
+    if (testId === 17) {
+      this.hideHeaderAndProgress();
+    } else {
+      this.showHeaderAndProgress();
+    }
+
     this.showScreen("startScreen");
 
     // Reset các giá trị
@@ -138,18 +143,19 @@ class QuizApp {
 
   // Cập nhật loadListeningQuestion để quản lý audio
   loadListeningQuestion(question) {
+    console.log("=== loadListeningQuestion START ===");
+    console.log("this.currentTest:", this.currentTest);
+    console.log("this.currentTest.passage:", this.currentTest.passage);
+
     const questionText = document.getElementById("questionText");
     const optionsContainer = document.getElementById("optionsContainer");
-
-    // Dừng audio cũ nếu có
-    this.stopCurrentAudio();
 
     // Thêm audio player nếu có
     let audioHtml = "";
     if (this.currentTest && this.currentTest.audioUrl) {
       audioHtml = `
       <div class="audio-player">
-        <audio controls id="listeningAudio">
+        <audio controls>
           <source src="${this.currentTest.audioUrl}" type="audio/mpeg">
           Trình duyệt không hỗ trợ audio.
         </audio>
@@ -158,14 +164,25 @@ class QuizApp {
     `;
     }
 
-    questionText.innerHTML = audioHtml + question.question;
+    // Thêm passage cho Test 15
+    let passageHtml = "";
+    if (this.currentTest.id === 15 && this.currentTest.passage) {
+      passageHtml = `
+      <div class="listening-passage">
+        <h4>📄 Đoạn văn tham khảo:</h4>
+        <div class="passage-content">${this.currentTest.passage}</div>
+      </div>
+    `;
+    }
 
-    // Lưu reference đến audio element
-    setTimeout(() => {
-      this.currentAudio = document.getElementById("listeningAudio");
-    }, 100);
+    questionText.innerHTML =
+      audioHtml +
+      passageHtml +
+      `<div class="question-text-content">${question.question}</div>`;
+    console.log("HTML updated successfully");
 
     this.createOptions(question);
+    console.log("=== loadListeningQuestion END ===");
   }
 
   stopCurrentAudio() {
@@ -599,7 +616,13 @@ class QuizApp {
 
       // Tạo nội dung câu hỏi theo loại
       if (this.currentExerciseType === "listening") {
-        this.loadListeningQuestion(question);
+        if (this.currentTest.format === "fill_in_blanks") {
+          this.loadFillInBlanksQuestion(question);
+        } else if (this.currentTest.format === "true_false") {
+          this.loadTrueFalseQuestion(question);
+        } else {
+          this.loadListeningQuestion(question);
+        }
       } else if (this.currentExerciseType === "grammar") {
         this.loadGrammarQuestion(question);
       } else {
@@ -625,12 +648,15 @@ class QuizApp {
     const questionText = document.getElementById("questionText");
     const optionsContainer = document.getElementById("optionsContainer");
 
+    // Dừng audio cũ nếu có
+    this.stopCurrentAudio();
+
     // Thêm audio player nếu có
     let audioHtml = "";
     if (this.currentTest && this.currentTest.audioUrl) {
       audioHtml = `
       <div class="audio-player">
-        <audio controls>
+        <audio controls id="listeningAudio">
           <source src="${this.currentTest.audioUrl}" type="audio/mpeg">
           Trình duyệt không hỗ trợ audio.
         </audio>
@@ -639,8 +665,401 @@ class QuizApp {
     `;
     }
 
-    questionText.innerHTML = audioHtml + question.question;
+    // Thêm passage theo từng bài test
+    let passageHtml = "";
+    switch (this.currentTest.id) {
+      case 13:
+      case 35:
+        // Test 13 không có passage
+        break;
+      case 15:
+      case 19:
+        passageHtml = `
+        <div class="listening-passage">
+          <h4>📄 Đoạn văn tham khảo:</h4>
+          <div class="passage-content">${this.currentTest.passage}</div>
+        </div>
+      `;
+        break;
+
+      default:
+        passageHtml = `
+        <div class="listening-passage">
+          <h4>🚧 Đang phát triển</h4>
+          <div class="passage-content">Bài test này đang được phát triển...</div>
+        </div>
+      `;
+        break;
+    }
+
+    questionText.innerHTML =
+      audioHtml +
+      passageHtml +
+      `<div class="question-text-content">${question.question}</div>`;
+
+    // Lưu reference đến audio element
+    setTimeout(() => {
+      this.currentAudio = document.getElementById("listeningAudio");
+    }, 100);
+
     this.createOptions(question);
+  }
+
+  loadTrueFalseQuestion(question) {
+    const questionText = document.getElementById("questionText");
+    const optionsContainer = document.getElementById("optionsContainer");
+
+    // Dừng audio cũ nếu có
+    this.stopCurrentAudio();
+
+    // Thêm audio player
+    let audioHtml = "";
+    if (this.currentTest && this.currentTest.audioUrl) {
+      audioHtml = `
+      <div class="audio-player">
+        <audio controls id="listeningAudio">
+          <source src="${this.currentTest.audioUrl}" type="audio/mpeg">
+          Trình duyệt không hỗ trợ audio.
+        </audio>
+        <p class="audio-note">💡 Bạn có thể nghe lại nhiều lần</p>
+      </div>
+    `;
+    }
+
+    // Thêm passage
+    let passageHtml = "";
+    if (this.currentTest.passage) {
+      passageHtml = `
+      <div class="listening-passage">
+        <h4>📄 Hướng dẫn:</h4>
+        <div class="passage-content">${this.currentTest.passage}</div>
+      </div>
+    `;
+    }
+
+    questionText.innerHTML = audioHtml + passageHtml;
+
+    // Tạo giao diện True/False với radio buttons
+    const userAnswer = this.userAnswers[this.currentQuestionIndex];
+    const questionNumber = this.currentQuestionIndex + 1;
+
+    optionsContainer.innerHTML = `
+    <div class="true-false-container">
+      <div class="question-statement">
+        <strong>${questionNumber}.</strong> ${question.question}
+      </div>
+      <div class="true-false-options">
+        <div class="tf-option">
+          <input type="radio" id="true_${questionNumber}" name="tf_${questionNumber}" value="0" 
+                 ${this.isAnswered ? "disabled" : ""} ${
+      userAnswer === 0 ? "checked" : ""
+    }>
+          <label for="true_${questionNumber}" class="tf-label ${
+      this.isAnswered && userAnswer === 0
+        ? question.correct === 0
+          ? "correct"
+          : "incorrect"
+        : ""
+    }">
+            <span class="tf-letter">A</span>
+            <span class="tf-text">True</span>
+          </label>
+        </div>
+        <div class="tf-option">
+          <input type="radio" id="false_${questionNumber}" name="tf_${questionNumber}" value="1" 
+                 ${this.isAnswered ? "disabled" : ""} ${
+      userAnswer === 1 ? "checked" : ""
+    }>
+          <label for="false_${questionNumber}" class="tf-label ${
+      this.isAnswered && userAnswer === 1
+        ? question.correct === 1
+          ? "correct"
+          : "incorrect"
+        : ""
+    }">
+            <span class="tf-letter">B</span>
+            <span class="tf-text">False</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  `;
+
+    // Thêm event listeners cho radio buttons
+    if (!this.isAnswered) {
+      const radioButtons = optionsContainer.querySelectorAll(
+        'input[type="radio"]'
+      );
+      radioButtons.forEach((radio) => {
+        radio.addEventListener("change", (e) => {
+          this.selectTrueFalseOption(parseInt(e.target.value));
+        });
+      });
+    }
+
+    // Hiển thị đáp án đúng nếu đã trả lời
+    if (this.isAnswered) {
+      const correctLabel = optionsContainer.querySelector(
+        `label[for="${
+          question.correct === 0 ? "true" : "false"
+        }_${questionNumber}"]`
+      );
+      if (correctLabel && userAnswer !== question.correct) {
+        correctLabel.classList.add("show-correct");
+      }
+    }
+
+    // Lưu reference đến audio element
+    setTimeout(() => {
+      this.currentAudio = document.getElementById("listeningAudio");
+    }, 100);
+  }
+
+  selectTrueFalseOption(optionValue) {
+    if (this.isAnswered) return;
+
+    const question = this.questions[this.currentQuestionIndex];
+    this.userAnswers[this.currentQuestionIndex] = optionValue;
+    this.isAnswered = true;
+
+    const isCorrect = optionValue === question.correct;
+    if (isCorrect) {
+      this.currentScore++;
+    }
+
+    // Cập nhật UI
+    const questionNumber = this.currentQuestionIndex + 1;
+    const selectedLabel = document.querySelector(
+      `label[for="${optionValue === 0 ? "true" : "false"}_${questionNumber}"]`
+    );
+    const correctLabel = document.querySelector(
+      `label[for="${
+        question.correct === 0 ? "true" : "false"
+      }_${questionNumber}"]`
+    );
+
+    selectedLabel.classList.add(isCorrect ? "correct" : "incorrect");
+    if (!isCorrect) {
+      correctLabel.classList.add("show-correct");
+    }
+
+    // Disable radio buttons
+    const radioButtons = document.querySelectorAll(
+      `input[name="tf_${questionNumber}"]`
+    );
+    radioButtons.forEach((radio) => (radio.disabled = true));
+
+    this.showFeedback(isCorrect, question.explanation, question.tip);
+    this.updateScore();
+    this.updateQuestionStatus();
+    this.updateNavigationButtons();
+
+    if (
+      this.autoNext &&
+      this.currentQuestionIndex < this.questions.length - 1
+    ) {
+      setTimeout(() => {
+        this.nextQuestion();
+      }, 1500);
+    } else if (this.currentQuestionIndex === this.questions.length - 1) {
+      setTimeout(() => {
+        document.getElementById("finishBtn").classList.add("pulse");
+      }, 1000);
+    }
+  }
+
+  // Thêm vào class QuizApp, sau method loadListeningQuestion
+  loadFillInBlanksQuestion(question) {
+    const questionText = document.getElementById("questionText");
+    const optionsContainer = document.getElementById("optionsContainer");
+
+    // Dừng audio cũ nếu có
+    this.stopCurrentAudio();
+
+    // Thêm audio player
+    let audioHtml = "";
+    if (this.currentTest && this.currentTest.audioUrl) {
+      audioHtml = `
+      <div class="audio-player">
+        <audio controls id="listeningAudio">
+          <source src="${this.currentTest.audioUrl}" type="audio/mpeg">
+          Trình duyệt không hỗ trợ audio.
+        </audio>
+        <p class="audio-note">💡 Bạn có thể nghe lại nhiều lần</p>
+      </div>
+    `;
+    }
+
+    // Thêm passage
+    let passageHtml = "";
+    if (this.currentTest.passage) {
+      passageHtml = `
+      <div class="listening-passage">
+        <h4>📄 Đoạn văn tham khảo:</h4>
+        <div class="passage-content">${this.currentTest.passage}</div>
+      </div>
+    `;
+    }
+
+    questionText.innerHTML = audioHtml + passageHtml;
+
+    // Tạo 10 ô input chia 2 cột với nút kiểm tra ở giữa
+    optionsContainer.innerHTML = `
+    <div class="fill-blanks-container">
+      <div class="blanks-grid">
+        ${Array.from(
+          { length: 10 },
+          (_, i) => `
+          <div class="blank-item">
+            <label>${i + 1}.</label>
+            <input type="text" id="blank${i + 1}" class="blank-input" 
+                   ${this.isAnswered ? "disabled" : ""}>
+          </div>
+        `
+        ).join("")}
+      </div>
+      <div class="submit-center">
+        <button class="submit-btn" id="submitBlanksBtn" onclick="quizApp.submitFillInBlanks()" 
+                ${this.isAnswered ? "disabled" : ""}>
+          Kiểm tra
+        </button>
+      </div>
+    </div>
+  `;
+
+    // Nếu đã trả lời, hiển thị đáp án
+    if (this.isAnswered) {
+      const userAnswers = this.userAnswers[this.currentQuestionIndex];
+      if (userAnswers) {
+        userAnswers.forEach((answer, index) => {
+          const input = document.getElementById(`blank${index + 1}`);
+          if (input) {
+            input.value = answer || "";
+            const isCorrect = this.checkTransformationAnswer(
+              answer,
+              this.questions[index].correctAnswer
+            );
+            input.classList.add(isCorrect ? "correct" : "incorrect");
+          }
+        });
+      }
+    }
+
+    // Lưu reference đến audio element
+    setTimeout(() => {
+      this.currentAudio = document.getElementById("listeningAudio");
+    }, 100);
+  }
+
+  // Thêm vào class QuizApp
+  submitFillInBlanks() {
+    if (this.isAnswered) return;
+
+    const userAnswers = [];
+    let hasEmptyAnswer = false;
+
+    // Lấy tất cả đáp án
+    for (let i = 1; i <= 10; i++) {
+      const input = document.getElementById(`blank${i}`);
+      const answer = input.value.trim();
+      userAnswers.push(answer);
+      if (!answer) hasEmptyAnswer = true;
+    }
+
+    if (hasEmptyAnswer) {
+      this.showEmptyAnswerModal();
+      return;
+    }
+
+    this.userAnswers[this.currentQuestionIndex] = userAnswers;
+    this.isAnswered = true;
+
+    // Tính điểm
+    let correctCount = 0;
+    userAnswers.forEach((answer, index) => {
+      const correctAnswer = this.questions[index].correctAnswer;
+      if (this.checkTransformationAnswer(answer, correctAnswer)) {
+        correctCount++;
+      }
+    });
+
+    this.currentScore += correctCount;
+
+    // Cập nhật UI
+    userAnswers.forEach((answer, index) => {
+      const input = document.getElementById(`blank${index + 1}`);
+      input.disabled = true;
+      const correctAnswer = this.questions[index].correctAnswer;
+      const isCorrect = this.checkTransformationAnswer(answer, correctAnswer);
+      input.classList.add(isCorrect ? "correct" : "incorrect");
+    });
+
+    document.getElementById("submitBlanksBtn").disabled = true;
+
+    this.showFeedback(
+      correctCount === 10,
+      `Bạn đã điền đúng ${correctCount}/10 từ.`,
+      "Nghe kỹ và chú ý ngữ cảnh của từng câu."
+    );
+
+    this.updateScore();
+    this.updateQuestionStatus();
+    this.updateNavigationButtons();
+
+    if (
+      this.autoNext &&
+      this.currentQuestionIndex < this.questions.length - 1
+    ) {
+      setTimeout(() => {
+        this.nextQuestion();
+      }, 2000);
+    } else if (this.currentQuestionIndex === this.questions.length - 1) {
+      setTimeout(() => {
+        document.getElementById("finishBtn").classList.add("pulse");
+      }, 1000);
+    }
+  }
+
+  // Thêm vào class QuizApp
+  showEmptyAnswerModal() {
+    const modal = document.getElementById("confirmModal");
+    const modalIcon = modal.querySelector(".modal-icon");
+    const modalTitle = modal.querySelector("h3");
+    const modalText = modal.querySelector("p");
+    const modalBtn = modal.querySelector(".btn-end-early");
+
+    modalIcon.textContent = "📝";
+    modalTitle.textContent = "Chưa hoàn thành";
+    modalText.innerHTML =
+      "Bạn chưa điền đủ tất cả các ô trống.<br>Vui lòng điền đầy đủ trước khi kiểm tra.";
+    modalBtn.innerHTML = `
+    <span class="btn-icon">✏️</span>
+    <span class="btn-text">Tiếp tục điền</span>
+  `;
+    modalBtn.onclick = () => this.closeEmptyAnswerModal();
+
+    modal.classList.add("show");
+  }
+
+  closeEmptyAnswerModal() {
+    const modal = document.getElementById("confirmModal");
+    const modalIcon = modal.querySelector(".modal-icon");
+    const modalTitle = modal.querySelector("h3");
+    const modalText = modal.querySelector("p");
+    const modalBtn = modal.querySelector(".btn-end-early");
+
+    // Reset về trạng thái ban đầu
+    modalIcon.textContent = "⚠️";
+    modalTitle.textContent = "Xác nhận kết thúc";
+    modalText.innerHTML =
+      "Bạn có chắc muốn kết thúc sớm bài làm?<br>Các câu chưa trả lời sẽ bị tính là sai.";
+    modalBtn.innerHTML = `
+    <span class="btn-icon">⚡</span>
+    <span class="btn-text">Kết thúc sớm</span>
+  `;
+    modalBtn.onclick = () => confirmEndEarly();
+
+    modal.classList.remove("show");
   }
 
   // Load câu hỏi Grammar
@@ -826,19 +1245,22 @@ class QuizApp {
 
   // Kiểm tra đáp án transformation
   checkTransformationAnswer(userAnswer, correctAnswer) {
-    // Normalize answers (remove extra spaces, convert to lowercase)
+    // Chỉ xử lý nếu cả hai đều là string hoặc có thể chuyển thành string hợp lệ
+    if (userAnswer == null || correctAnswer == null) {
+      return false;
+    }
+
     const normalizeAnswer = (answer) => {
-      return answer
+      return String(answer)
         .toLowerCase()
-        .replace(/[.,!?;:"']/g, "") // Remove punctuation
-        .replace(/\s+/g, " ") // Replace multiple spaces with single space
+        .replace(/[.,!?;:"']/g, "")
+        .replace(/\s+/g, " ")
         .trim();
     };
 
     const normalizedUser = normalizeAnswer(userAnswer);
     const normalizedCorrect = normalizeAnswer(correctAnswer);
 
-    // Check if answers match (allowing for minor variations)
     return normalizedUser === normalizedCorrect;
   }
 
@@ -908,17 +1330,38 @@ class QuizApp {
     const status = document.getElementById("questionStatus");
     const userAnswer = this.userAnswers[this.currentQuestionIndex];
 
-    if (userAnswer !== null) {
+    if (userAnswer !== null && userAnswer !== undefined) {
       const question = this.questions[this.currentQuestionIndex];
       let isCorrect;
 
       if (this.currentExerciseType === "grammar") {
         isCorrect = userAnswer === question.correct;
-      } else {
+      } else if (this.currentExerciseType === "transformation") {
         isCorrect = this.checkTransformationAnswer(
           userAnswer,
           question.correctAnswer
         );
+      } else if (
+        this.currentExerciseType === "listening" &&
+        this.currentTest.format === "fill_in_blanks"
+      ) {
+        // Tính tỷ lệ đúng cho fill_in_blanks
+        if (Array.isArray(userAnswer)) {
+          let correctCount = 0;
+          userAnswer.forEach((answer, index) => {
+            if (
+              this.checkTransformationAnswer(
+                answer,
+                this.questions[index].correctAnswer
+              )
+            ) {
+              correctCount++;
+            }
+          });
+          isCorrect = correctCount >= 7; // Đúng >= 7/10 từ
+        }
+      } else {
+        isCorrect = false; // fallback
       }
 
       status.className = `question-status ${
@@ -941,7 +1384,18 @@ class QuizApp {
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
     const finishBtn = document.getElementById("finishBtn");
+    const autoNextCheckbox = document.getElementById("autoNextCheckbox");
 
+    // Ẩn tất cả nút điều hướng cho Test 17
+    if (this.currentTest && this.currentTest.id === 17) {
+      prevBtn.style.display = "none";
+      nextBtn.style.display = "none";
+      finishBtn.style.display = "none";
+      autoNextCheckbox.parentElement.style.display = "none";
+      return;
+    }
+
+    // Logic bình thường cho các test khác
     prevBtn.disabled = this.currentQuestionIndex === 0;
 
     if (this.currentQuestionIndex === this.questions.length - 1) {
@@ -1142,7 +1596,26 @@ class QuizApp {
           this.currentExerciseType === "grammar" ||
           this.currentExerciseType === "listening"
         ) {
-          isCorrect = userAnswer === question.correct;
+          // Kiểm tra format
+          if (
+            this.currentTest &&
+            this.currentTest.format === "fill_in_blanks"
+          ) {
+            if (Array.isArray(userAnswer)) {
+              isCorrect = this.checkTransformationAnswer(
+                userAnswer[index] || "",
+                question.correctAnswer
+              );
+            }
+          } else if (
+            this.currentTest &&
+            this.currentTest.format === "true_false"
+          ) {
+            isCorrect = userAnswer === question.correct;
+          } else {
+            // Multiple choice format
+            isCorrect = userAnswer === question.correct;
+          }
         } else {
           isCorrect = this.checkTransformationAnswer(
             userAnswer,
@@ -1156,7 +1629,22 @@ class QuizApp {
         isCorrect ? "correct" : "incorrect"
       }`;
 
-      if (
+      // Kiểm tra format để tạo review phù hợp
+      if (this.currentTest && this.currentTest.format === "fill_in_blanks") {
+        reviewItem.innerHTML = this.createFillInBlanksReview(
+          question,
+          index,
+          userAnswer,
+          isCorrect
+        );
+      } else if (this.currentTest && this.currentTest.format === "true_false") {
+        reviewItem.innerHTML = this.createTrueFalseReview(
+          question,
+          index,
+          userAnswer,
+          isCorrect
+        );
+      } else if (
         this.currentExerciseType === "grammar" ||
         this.currentExerciseType === "listening"
       ) {
@@ -1180,6 +1668,101 @@ class QuizApp {
 
       container.appendChild(reviewItem);
     });
+  }
+
+  createTrueFalseReview(question, index, userAnswer, isCorrect) {
+    const hasAnswer = userAnswer !== null && userAnswer !== undefined;
+    const userAnswerText = hasAnswer
+      ? userAnswer === 0
+        ? "True"
+        : "False"
+      : "(Chưa trả lời)";
+    const correctAnswerText = question.correct === 0 ? "True" : "False";
+
+    return `
+    <div class="review-question">
+      <strong>Câu ${index + 1}:</strong> ${question.question}
+    </div>
+    <div class="review-options">
+      <div class="review-option ${
+        hasAnswer ? (isCorrect ? "user-correct" : "user-answer") : ""
+      }">
+        <strong>Bạn chọn:</strong> ${userAnswerText}
+      </div>
+      <div class="review-option correct-answer">
+        <strong>Đáp án đúng:</strong> ${correctAnswerText}
+      </div>
+    </div>
+    <div class="review-result ${isCorrect ? "correct" : "incorrect"}">
+      ${hasAnswer ? (isCorrect ? "✅ Đúng" : "❌ Sai") : "⚪ Chưa trả lời"}
+    </div>
+    <div class="review-feedback">
+      ${
+        question.explanation
+          ? `
+        <div class="review-explanation">
+          <strong>💡 Giải thích:</strong> ${question.explanation}
+        </div>
+      `
+          : ""
+      }
+      ${
+        question.tip
+          ? `
+        <div class="review-tip">
+          <strong>✨ Mẹo:</strong> ${question.tip}
+        </div>
+      `
+          : ""
+      }
+    </div>
+  `;
+  }
+
+  createFillInBlanksReview(question, index, userAnswer, isCorrect) {
+    const userAnswerArray = Array.isArray(userAnswer) ? userAnswer : [];
+    const userAnswerText = userAnswerArray[index] || "(Chưa trả lời)";
+    const hasAnswer =
+      userAnswerArray[index] && userAnswerArray[index].trim() !== "";
+
+    return `
+    <div class="review-question">
+      <strong>Câu ${index + 1}:</strong> ${question.question}
+    </div>
+    <div class="review-options">
+      <div class="review-option ${
+        hasAnswer ? (isCorrect ? "user-correct" : "user-answer") : ""
+      }">
+        <strong>Bạn trả lời:</strong> ${userAnswerText}
+      </div>
+      <div class="review-option correct-answer">
+        <strong>Đáp án đúng:</strong> ${question.correctAnswer}
+      </div>
+    </div>
+    <div class="review-result ${isCorrect ? "correct" : "incorrect"}">
+      ${hasAnswer ? (isCorrect ? "✅ Đúng" : "❌ Sai") : "⚪ Chưa trả lời"}
+    </div>
+    <div class="review-feedback">
+      ${
+        question.explanation
+          ? `
+        <div class="review-explanation">
+          <strong>💡 Giải thích:</strong> ${question.explanation}
+        </div>
+      `
+          : ""
+      }
+      ${
+        question.tip
+          ? `
+        <div class="review-tip">
+          <strong>✨ Mẹo:</strong> ${question.tip}
+        </div>
+      `
+          : ""
+      }
+    </div>
+  `;
   }
 
   // Tạo review cho Grammar
@@ -1325,6 +1908,15 @@ function selectLesson(lessonId) {
 }
 
 function closeConfirmModal() {
+  // Kiểm tra nếu đang ở Test 17 và modal đang hiện thông báo chưa điền đủ
+  if (quizApp.currentTest && quizApp.currentTest.id === 17) {
+    const modalTitle = document.querySelector("#confirmModal h3");
+    if (modalTitle && modalTitle.textContent === "Chưa hoàn thành") {
+      quizApp.closeEmptyAnswerModal();
+      return;
+    }
+  }
+
   const modal = document.getElementById("confirmModal");
   modal.classList.remove("show");
 }
