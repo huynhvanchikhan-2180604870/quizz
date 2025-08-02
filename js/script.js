@@ -438,6 +438,7 @@ class QuizApp {
   // Quay lại chọn bài
   backToLessons() {
     this.stopCurrentAudio();
+    this.removeAudioPlayer();
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
     }
@@ -590,6 +591,230 @@ class QuizApp {
     }, 1000);
   }
 
+  createAudioPlayer() {
+    if (this.currentTest && this.currentTest.audioUrl) {
+      const existingPlayer = document.getElementById("audioPlayerContainer");
+      if (existingPlayer) return;
+
+      const audioContainer = document.createElement("div");
+      audioContainer.className = "audio-player-container";
+      audioContainer.id = "audioPlayerContainer";
+      audioContainer.innerHTML = `
+      <div class="mobile-audio-player">
+        <div class="audio-wave">
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+        </div>
+        
+        <div class="audio-info">
+          <div class="audio-title">🎧 Audio bài nghe</div>
+          <div class="audio-time">
+            <span id="currentTime">0:00</span> / <span id="totalTime">0:00</span>
+          </div>
+        </div>
+        
+        <div class="audio-progress">
+          <div class="progress-track" id="progressTrack">
+            <div class="progress-fill" id="progressFill"></div>
+            <div class="progress-thumb" id="progressThumb"></div>
+          </div>
+        </div>
+        
+        <div class="audio-controls">
+          <button class="control-btn replay-btn" id="replayBtn">⏮</button>
+          <button class="control-btn play-btn" id="playBtn">
+            <div class="play-icon" id="playIcon">▶</div>
+          </button>
+          <button class="control-btn forward-btn" id="forwardBtn">⏭</button>
+        </div>
+        
+        <div class="audio-tip">
+          <span class="tip-pulse">💡</span>
+          Chạm để phát/dừng • Kéo thanh để tua
+        </div>
+        
+        <audio id="listeningAudio" preload="metadata">
+          <source src="${this.currentTest.audioUrl}" type="audio/mpeg">
+        </audio>
+      </div>
+    `;
+
+      const questionScreen = document.getElementById("questionScreen");
+      questionScreen.insertBefore(audioContainer, questionScreen.firstChild);
+
+      this.currentAudio = document.getElementById("listeningAudio");
+      this.setupMobileAudioControls();
+    }
+  }
+
+  setupMobileAudioControls() {
+    const audio = this.currentAudio;
+    const playBtn = document.getElementById("playBtn");
+    const playIcon = document.getElementById("playIcon");
+    const replayBtn = document.getElementById("replayBtn");
+    const forwardBtn = document.getElementById("forwardBtn");
+    const progressTrack = document.getElementById("progressTrack");
+    const progressFill = document.getElementById("progressFill");
+    const progressThumb = document.getElementById("progressThumb");
+    const currentTime = document.getElementById("currentTime");
+    const totalTime = document.getElementById("totalTime");
+
+    let isPlaying = false;
+
+    // Play/Pause
+    playBtn.addEventListener("click", () => {
+      if (isPlaying) {
+        audio.pause();
+        playIcon.textContent = "▶";
+        playBtn.classList.remove("playing");
+        this.stopWaveAnimation();
+      } else {
+        audio.play();
+        playIcon.textContent = "⏸";
+        playBtn.classList.add("playing");
+        this.startWaveAnimation();
+      }
+      isPlaying = !isPlaying;
+    });
+
+    // Replay/Forward buttons
+    replayBtn.addEventListener("click", () => {
+      audio.currentTime = Math.max(0, audio.currentTime - 10);
+      this.createRipple(replayBtn);
+    });
+
+    forwardBtn.addEventListener("click", () => {
+      audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
+      this.createRipple(forwardBtn);
+    });
+
+    // Progress update
+    audio.addEventListener("timeupdate", () => {
+      if (audio.duration) {
+        const progress = (audio.currentTime / audio.duration) * 100;
+        progressFill.style.width = progress + "%";
+        currentTime.textContent = this.formatTime(audio.currentTime);
+      }
+    });
+
+    // Load metadata
+    audio.addEventListener("loadedmetadata", () => {
+      totalTime.textContent = this.formatTime(audio.duration);
+    });
+
+    // Progress bar interaction - sử dụng passive: false để có thể preventDefault
+    progressTrack.addEventListener(
+      "touchstart",
+      (e) => {
+        this.handleProgressStart(e);
+      },
+      { passive: false }
+    );
+
+    progressTrack.addEventListener("mousedown", (e) => {
+      this.handleProgressStart(e);
+    });
+
+    // Audio ended
+    audio.addEventListener("ended", () => {
+      playIcon.textContent = "▶";
+      playBtn.classList.remove("playing");
+      this.stopWaveAnimation();
+      isPlaying = false;
+    });
+  }
+
+  handleProgressStart(e) {
+    const audio = this.currentAudio;
+    const progressTrack = document.getElementById("progressTrack");
+    const progressFill = document.getElementById("progressFill");
+    const progressThumb = document.getElementById("progressThumb");
+    let isDragging = true;
+
+    // Ngăn scroll khi đang kéo progress bar
+    const preventScroll = (e) => {
+      if (isDragging) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+
+    const updateProgress = (e) => {
+      if (!isDragging) return;
+
+      const rect = progressTrack.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const progress = Math.max(
+        0,
+        Math.min(1, (clientX - rect.left) / rect.width)
+      );
+
+      progressFill.style.width = progress * 100 + "%";
+      progressThumb.style.left = progress * 100 + "%";
+      progressThumb.style.opacity = "1";
+
+      if (audio.duration) {
+        audio.currentTime = progress * audio.duration;
+      }
+    };
+
+    const stopDrag = () => {
+      isDragging = false;
+      progressThumb.style.opacity = "0";
+
+      // Remove all event listeners
+      document.removeEventListener("touchmove", updateProgress, {
+        passive: false,
+      });
+      document.removeEventListener("mousemove", updateProgress);
+      document.removeEventListener("touchend", stopDrag);
+      document.removeEventListener("mouseup", stopDrag);
+      document.removeEventListener("touchmove", preventScroll, {
+        passive: false,
+      });
+    };
+
+    // Prevent default behavior and add event listeners
+    if (e.type === "touchstart") {
+      document.addEventListener("touchmove", preventScroll, { passive: false });
+      document.addEventListener("touchmove", updateProgress, {
+        passive: false,
+      });
+      document.addEventListener("touchend", stopDrag);
+    } else {
+      document.addEventListener("mousemove", updateProgress);
+      document.addEventListener("mouseup", stopDrag);
+    }
+
+    updateProgress(e);
+  }
+
+  startWaveAnimation() {
+    const waveBars = document.querySelectorAll(".wave-bar");
+    waveBars.forEach((bar) => bar.classList.add("active"));
+  }
+
+  stopWaveAnimation() {
+    const waveBars = document.querySelectorAll(".wave-bar");
+    waveBars.forEach((bar) => bar.classList.remove("active"));
+  }
+
+  createRipple(button) {
+    const ripple = document.createElement("div");
+    ripple.className = "ripple";
+    button.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 600);
+  }
+
+  formatTime(seconds) {
+    if (isNaN(seconds)) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  }
+
   // Load câu hỏi hiện tại
   loadQuestion() {
     const question = this.questions[this.currentQuestionIndex];
@@ -614,7 +839,15 @@ class QuizApp {
         this.currentQuestionIndex + 1
       }/${this.questions.length}`;
 
-      // Tạo nội dung câu hỏi theo loại
+      // Tạo audio player một lần duy nhất cho listening
+      if (
+        this.currentExerciseType === "listening" &&
+        this.currentQuestionIndex === 0
+      ) {
+        this.createAudioPlayer();
+      }
+
+      // Tạo nội dung câu hỏi theo loại (không bao gồm audio)
       if (this.currentExerciseType === "listening") {
         if (this.currentTest.format === "fill_in_blanks") {
           this.loadFillInBlanksQuestion(question);
@@ -648,24 +881,7 @@ class QuizApp {
     const questionText = document.getElementById("questionText");
     const optionsContainer = document.getElementById("optionsContainer");
 
-    // Dừng audio cũ nếu có
-    this.stopCurrentAudio();
-
-    // Thêm audio player nếu có
-    let audioHtml = "";
-    if (this.currentTest && this.currentTest.audioUrl) {
-      audioHtml = `
-      <div class="audio-player">
-        <audio controls id="listeningAudio">
-          <source src="${this.currentTest.audioUrl}" type="audio/mpeg">
-          Trình duyệt không hỗ trợ audio.
-        </audio>
-        <p class="audio-note">💡 Bạn có thể nghe lại nhiều lần</p>
-      </div>
-    `;
-    }
-
-    // Thêm passage theo từng bài test
+    // Không tạo audio HTML nữa, chỉ tạo passage và question content
     let passageHtml = "";
     switch (this.currentTest.id) {
       case 13:
@@ -681,7 +897,6 @@ class QuizApp {
         </div>
       `;
         break;
-
       default:
         passageHtml = `
         <div class="listening-passage">
@@ -693,15 +908,8 @@ class QuizApp {
     }
 
     questionText.innerHTML =
-      audioHtml +
       passageHtml +
       `<div class="question-text-content">${question.question}</div>`;
-
-    // Lưu reference đến audio element
-    setTimeout(() => {
-      this.currentAudio = document.getElementById("listeningAudio");
-    }, 100);
-
     this.createOptions(question);
   }
 
@@ -709,24 +917,7 @@ class QuizApp {
     const questionText = document.getElementById("questionText");
     const optionsContainer = document.getElementById("optionsContainer");
 
-    // Dừng audio cũ nếu có
-    this.stopCurrentAudio();
-
-    // Thêm audio player
-    let audioHtml = "";
-    if (this.currentTest && this.currentTest.audioUrl) {
-      audioHtml = `
-      <div class="audio-player">
-        <audio controls id="listeningAudio">
-          <source src="${this.currentTest.audioUrl}" type="audio/mpeg">
-          Trình duyệt không hỗ trợ audio.
-        </audio>
-        <p class="audio-note">💡 Bạn có thể nghe lại nhiều lần</p>
-      </div>
-    `;
-    }
-
-    // Thêm passage
+    // Không tạo audio HTML nữa, chỉ tạo passage
     let passageHtml = "";
     if (this.currentTest.passage) {
       passageHtml = `
@@ -737,9 +928,9 @@ class QuizApp {
     `;
     }
 
-    questionText.innerHTML = audioHtml + passageHtml;
+    questionText.innerHTML = passageHtml;
 
-    // Tạo giao diện True/False với radio buttons
+    // Phần còn lại giữ nguyên...
     const userAnswer = this.userAnswers[this.currentQuestionIndex];
     const questionNumber = this.currentQuestionIndex + 1;
 
@@ -808,11 +999,6 @@ class QuizApp {
         correctLabel.classList.add("show-correct");
       }
     }
-
-    // Lưu reference đến audio element
-    setTimeout(() => {
-      this.currentAudio = document.getElementById("listeningAudio");
-    }, 100);
   }
 
   selectTrueFalseOption(optionValue) {
@@ -873,24 +1059,7 @@ class QuizApp {
     const questionText = document.getElementById("questionText");
     const optionsContainer = document.getElementById("optionsContainer");
 
-    // Dừng audio cũ nếu có
-    this.stopCurrentAudio();
-
-    // Thêm audio player
-    let audioHtml = "";
-    if (this.currentTest && this.currentTest.audioUrl) {
-      audioHtml = `
-      <div class="audio-player">
-        <audio controls id="listeningAudio">
-          <source src="${this.currentTest.audioUrl}" type="audio/mpeg">
-          Trình duyệt không hỗ trợ audio.
-        </audio>
-        <p class="audio-note">💡 Bạn có thể nghe lại nhiều lần</p>
-      </div>
-    `;
-    }
-
-    // Thêm passage
+    // Không tạo audio HTML nữa, chỉ tạo passage
     let passageHtml = "";
     if (this.currentTest.passage) {
       passageHtml = `
@@ -901,9 +1070,9 @@ class QuizApp {
     `;
     }
 
-    questionText.innerHTML = audioHtml + passageHtml;
+    questionText.innerHTML = passageHtml;
 
-    // Tạo 10 ô input chia 2 cột với nút kiểm tra ở giữa
+    // Phần còn lại giữ nguyên...
     optionsContainer.innerHTML = `
     <div class="fill-blanks-container">
       <div class="blanks-grid">
@@ -944,11 +1113,14 @@ class QuizApp {
         });
       }
     }
+  }
 
-    // Lưu reference đến audio element
-    setTimeout(() => {
-      this.currentAudio = document.getElementById("listeningAudio");
-    }, 100);
+  removeAudioPlayer() {
+    const existingPlayer = document.getElementById("audioPlayerContainer");
+    if (existingPlayer) {
+      existingPlayer.remove();
+    }
+    this.currentAudio = null;
   }
 
   // Thêm vào class QuizApp
