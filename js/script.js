@@ -1417,7 +1417,6 @@ class QuizApp {
 
   // Kiểm tra đáp án transformation
   checkTransformationAnswer(userAnswer, correctAnswer) {
-    // Chỉ xử lý nếu cả hai đều là string hoặc có thể chuyển thành string hợp lệ
     if (userAnswer == null || correctAnswer == null) {
       return false;
     }
@@ -1425,7 +1424,8 @@ class QuizApp {
     const normalizeAnswer = (answer) => {
       return String(answer)
         .toLowerCase()
-        .replace(/[.,!?;:"']/g, "")
+        .replace(/['']/g, "'") // Chuyển cả ' và ' thành '
+        .replace(/[.,!?;:\"]/g, "")
         .replace(/\s+/g, " ")
         .trim();
     };
