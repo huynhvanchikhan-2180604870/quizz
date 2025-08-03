@@ -1424,7 +1424,7 @@ class QuizApp {
     const normalizeAnswer = (answer) => {
       return String(answer)
         .toLowerCase()
-        .replace(/['']/g, "'") // Chuyển cả ' và ' thành '
+        .replace(/['']/g, "’") // Chuyển cả ' và ' thành '
         .replace(/[.,!?;:\"]/g, "")
         .replace(/\s+/g, " ")
         .trim();
