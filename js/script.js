@@ -24,16 +24,15 @@ class QuizApp {
   // Khởi tạo ứng dụng
   async init() {
     try {
-      // Load cả 2 loại data
       this.grammarQuestions = questionsData.questions;
       this.sentenceQuestions = sentenceData.questions;
       this.speakingTopics = speakingData.topics;
       this.writingTopics = writingData.topics;
       this.listeningTests = listeningData.tests;
-      // Hiện màn hình chọn dạng bài
+      this.clozeTests = clozeData.tests; // Thêm dòng này
+
       this.showScreen("exerciseTypeScreen");
       this.hideHeaderAndProgress();
-      // Ẩn quiz info ban đầu
       document.querySelector(".container").classList.add("hide-quiz-info");
 
       document
@@ -59,6 +58,71 @@ class QuizApp {
     document.querySelector(".progress-container").style.display = "block";
   }
 
+  createClozeReview(question, index, userAnswer, isCorrect) {
+    const hasAnswer = userAnswer !== null && userAnswer !== undefined;
+    const userAnswerText = hasAnswer
+      ? question.options[userAnswer]
+      : "(Chưa trả lời)";
+    const correctAnswerText = question.options[question.correct];
+
+    return `
+    <div class="review-question">
+      <strong>Câu ${index + 1}:</strong> ${question.question}
+    </div>
+    <div class="review-options">
+      ${question.options
+        .map((option, optIndex) => {
+          let className = "review-option";
+          let icon = "";
+
+          if (optIndex === question.correct) {
+            className += " correct-answer";
+            icon = "✅ ";
+          }
+          if (hasAnswer && optIndex === userAnswer) {
+            if (userAnswer === question.correct) {
+              className += " user-correct";
+            } else {
+              className += " user-answer";
+              icon = "❌ ";
+            }
+          }
+
+          return `
+          <div class="${className}">
+            <strong>${String.fromCharCode(65 + optIndex)}.</strong>
+            ${icon}${option}
+          </div>
+        `;
+        })
+        .join("")}
+    </div>
+    <div class="review-result ${isCorrect ? "correct" : "incorrect"}">
+      ${hasAnswer ? (isCorrect ? "✅ Đúng" : "❌ Sai") : "⚪ Chưa trả lời"}
+    </div>
+    <div class="review-feedback">
+      ${
+        question.explanation
+          ? `
+        <div class="review-explanation">
+          <strong>💡 Giải thích:</strong> ${question.explanation}
+        </div>
+      `
+          : ""
+      }
+      ${
+        question.tip
+          ? `
+        <div class="review-tip">
+          <strong>✨ Mẹo:</strong> ${question.tip}
+        </div>
+      `
+          : ""
+      }
+    </div>
+  `;
+  }
+
   // Chọn dạng bài tập
   selectExerciseType(type) {
     this.currentExerciseType = type;
@@ -78,6 +142,10 @@ class QuizApp {
     } else if (type === "listening") {
       this.allQuestions = this.listeningTests;
       this.setupListeningTests();
+    } else if (type === "cloze") {
+      // Thêm case này
+      this.allQuestions = this.clozeTests;
+      this.setupClozeTests();
     }
 
     this.hideHeaderAndProgress();
@@ -822,16 +890,13 @@ class QuizApp {
 
     this.isAnswered = this.userAnswers[this.currentQuestionIndex] !== null;
 
-    // Animation fade
     questionScreen.style.opacity = "0.7";
     questionScreen.style.transform = "translateY(10px)";
 
     setTimeout(() => {
-      // Cập nhật số câu hỏi
       document.getElementById("currentQuestion").textContent =
         this.currentQuestionIndex + 1;
 
-      // Cập nhật progress bar
       const progress =
         ((this.currentQuestionIndex + 1) / this.questions.length) * 100;
       document.getElementById("progressFill").style.width = progress + "%";
@@ -839,39 +904,21 @@ class QuizApp {
         this.currentQuestionIndex + 1
       }/${this.questions.length}`;
 
-      // Tạo audio player một lần duy nhất cho listening
-      if (
-        this.currentExerciseType === "listening" &&
-        this.currentQuestionIndex === 0
-      ) {
-        this.createAudioPlayer();
-      }
-
-      // Tạo nội dung câu hỏi theo loại (không bao gồm audio)
-      if (this.currentExerciseType === "listening") {
-        if (this.currentTest.format === "fill_in_blanks") {
-          this.loadFillInBlanksQuestion(question);
-        } else if (this.currentTest.format === "true_false") {
-          this.loadTrueFalseQuestion(question);
-        } else {
-          this.loadListeningQuestion(question);
-        }
+      // Load question based on type
+      if (this.currentExerciseType === "cloze") {
+        this.loadClozeQuestion(question);
+      } else if (this.currentExerciseType === "listening") {
+        // existing listening logic...
       } else if (this.currentExerciseType === "grammar") {
         this.loadGrammarQuestion(question);
       } else {
         this.loadTransformationQuestion(question);
       }
 
-      // Cập nhật status nếu đã trả lời
       this.updateQuestionStatus();
-
-      // Cập nhật buttons
       this.updateNavigationButtons();
-
-      // Ẩn feedback
       document.getElementById("answerFeedback").style.display = "none";
 
-      // Fade in
       questionScreen.style.opacity = "1";
       questionScreen.style.transform = "translateY(0)";
     }, 150);
@@ -1506,7 +1553,10 @@ class QuizApp {
       const question = this.questions[this.currentQuestionIndex];
       let isCorrect;
 
-      if (this.currentExerciseType === "grammar") {
+      if (
+        this.currentExerciseType === "grammar" ||
+        this.currentExerciseType === "cloze"
+      ) {
         isCorrect = userAnswer === question.correct;
       } else if (this.currentExerciseType === "transformation") {
         isCorrect = this.checkTransformationAnswer(
@@ -1517,7 +1567,6 @@ class QuizApp {
         this.currentExerciseType === "listening" &&
         this.currentTest.format === "fill_in_blanks"
       ) {
-        // Tính tỷ lệ đúng cho fill_in_blanks
         if (Array.isArray(userAnswer)) {
           let correctCount = 0;
           userAnswer.forEach((answer, index) => {
@@ -1530,10 +1579,10 @@ class QuizApp {
               correctCount++;
             }
           });
-          isCorrect = correctCount >= 7; // Đúng >= 7/10 từ
+          isCorrect = correctCount >= 7;
         }
       } else {
-        isCorrect = false; // fallback
+        isCorrect = userAnswer === question.correct;
       }
 
       status.className = `question-status ${
@@ -1610,7 +1659,6 @@ class QuizApp {
     let correctCount = 0;
     let answeredCount = 0;
 
-    // Đảm bảo userAnswers có đủ length
     while (this.userAnswers.length < this.questions.length) {
       this.userAnswers.push(null);
     }
@@ -1623,7 +1671,8 @@ class QuizApp {
 
         if (
           this.currentExerciseType === "grammar" ||
-          this.currentExerciseType === "listening"
+          this.currentExerciseType === "listening" ||
+          this.currentExerciseType === "cloze"
         ) {
           isCorrect = answer === question.correct;
         } else {
@@ -1754,7 +1803,6 @@ class QuizApp {
     const container = document.getElementById("reviewContainer");
     container.innerHTML = "";
 
-    // Đảm bảo userAnswers có đủ length
     while (this.userAnswers.length < this.questions.length) {
       this.userAnswers.push(null);
     }
@@ -1764,7 +1812,9 @@ class QuizApp {
       let isCorrect = false;
 
       if (userAnswer !== null && userAnswer !== undefined) {
-        if (
+        if (this.currentExerciseType === "cloze") {
+          isCorrect = userAnswer === question.correct;
+        } else if (
           this.currentExerciseType === "grammar" ||
           this.currentExerciseType === "listening"
         ) {
@@ -1802,7 +1852,17 @@ class QuizApp {
       }`;
 
       // Kiểm tra format để tạo review phù hợp
-      if (this.currentTest && this.currentTest.format === "fill_in_blanks") {
+      if (this.currentExerciseType === "cloze") {
+        reviewItem.innerHTML = this.createClozeReview(
+          question,
+          index,
+          userAnswer,
+          isCorrect
+        );
+      } else if (
+        this.currentTest &&
+        this.currentTest.format === "fill_in_blanks"
+      ) {
         reviewItem.innerHTML = this.createFillInBlanksReview(
           question,
           index,
@@ -1936,7 +1996,76 @@ class QuizApp {
     </div>
   `;
   }
+  setupClozeTests() {
+    const lessonGrid = document.getElementById("lessonGrid");
+    const lessonTitle = document.getElementById("lessonTitle");
 
+    lessonTitle.textContent = "📄 Cloze Test - Chọn bài test";
+    lessonGrid.innerHTML = "";
+
+    this.clozeTests.forEach((test) => {
+      const lessonBtn = document.createElement("button");
+      lessonBtn.className = "lesson-btn";
+      lessonBtn.onclick = () => this.selectClozeTest(test.id);
+      lessonBtn.innerHTML = `
+            <span class="lesson-number">${test.icon} Test ${test.id}</span>
+            <span class="lesson-range">${test.questions.length} câu hỏi</span>
+        `;
+      lessonGrid.appendChild(lessonBtn);
+    });
+  }
+
+  selectClozeTest(testId) {
+    const test = this.clozeTests.find((t) => t.id === testId);
+    if (!test) return;
+
+    this.questions = test.questions;
+    this.currentTest = test;
+    this.currentExerciseType = "cloze";
+
+    document.querySelector(
+      ".header-content h1"
+    ).textContent = `📄 ${test.title}`;
+    document.getElementById(
+      "welcomeText"
+    ).innerHTML = `Bạn sẽ đọc đoạn văn và chọn từ phù hợp điền vào ${test.questions.length} chỗ trống.<br>
+         Đọc kỹ đoạn văn trước khi chọn đáp án.`;
+
+    this.showHeaderAndProgress();
+    this.showScreen("startScreen");
+
+    // Reset values
+    this.currentQuestionIndex = 0;
+    this.userAnswers = new Array(this.questions.length).fill(null);
+    this.currentScore = 0;
+    this.isAnswered = false;
+
+    this.updateTotalQuestions();
+    document.getElementById("elapsedTime").textContent = "00:00";
+    document.getElementById("currentScore").textContent = "0";
+  }
+
+  loadClozeQuestion(question) {
+    const questionText = document.getElementById("questionText");
+
+    const passageWithBlanks = this.currentTest.passage.replace(
+      /\((\d+)\)\s*______/g,
+      (match, num) => `<span class="blank-number">${num}</span>______`
+    );
+
+    questionText.innerHTML = `
+        <div class="cloze-passage">
+            ${passageWithBlanks}
+        </div>
+        <div class="question-text-content">
+            <strong>Câu ${this.currentQuestionIndex + 1}:</strong> ${
+      question.question
+    }
+        </div>
+    `;
+
+    this.createOptions(question);
+  }
   // Tạo review cho Grammar
   createGrammarReview(question, index, userAnswer, isCorrect) {
     return `
