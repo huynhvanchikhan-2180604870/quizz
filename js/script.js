@@ -1608,7 +1608,7 @@ class QuizApp {
     const autoNextCheckbox = document.getElementById("autoNextCheckbox");
 
     // Ẩn tất cả nút điều hướng cho Test 17
-    if (this.currentTest && this.currentTest.id === 17) {
+    if (this.currentTest && this.currentTest.id === 17 && this.currentExerciseType === "listening") {
       prevBtn.style.display = "none";
       nextBtn.style.display = "none";
       finishBtn.style.display = "none";
