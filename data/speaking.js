@@ -74,22 +74,22 @@ const speakingData = {
         {
           question: "When and where does it happen?",
           answer:
-            "In Vietnam, the most important traditional festival is Tết Holiday (Lunar New Year). It usually happens in February and is celebrated everywhere in the country, especially in homes and cities.",
+            "Tết Holiday is in February. We celebrate it everywhere in Vietnam.",
         },
         {
           question: "What do people usually do in that festival?",
           answer:
-            "People clean their houses, decorate with flowers like peach blossoms or kumquat trees, and prepare special food such as bánh chưng (square sticky rice cake).\n\nThey also visit family, play cards, travel, and give lucky money (lì xì) to children.",
+            "We clean houses and buy flowers. We make special food like bánh chưng. We visit family and give money to children.",
         },
         {
           question: "What is special about it?",
           answer:
-            "Tết is special because it is a time for family reunion. People who live far away come back home. It is also a time for new beginnings and wishing for good luck.",
+            "Tết is special because families come together. It's time for new hopes and good luck.",
         },
         {
           question: "Why is it more important than other festivals?",
           answer:
-            "Because it is the biggest and longest holiday in Vietnam. Everyone gets about two weeks off to relax and spend time with their family and friends. It makes people feel happy and hopeful for the new year.",
+            "Because it's our biggest holiday. Everyone has 2 weeks off. It makes us happy.",
         },
       ],
     },
@@ -101,22 +101,22 @@ const speakingData = {
       questions: [
         {
           question: "What job do you want to have?",
-          answer: "I want to be a Korean teacher in the future.",
+          answer: "I want to be a Korean teacher.",
         },
         {
           question: "What does this job involve?",
           answer:
-            "This job involves teaching Korean language to students. I will need to have knowledge about Korean grammar, vocabulary, and culture.\n\nI also have to prepare lessons, check homework, and help students speak Korean well.",
+            "I teach Korean language. I prepare lessons and help students speak Korean well.",
         },
         {
           question: "Why do you choose it?",
           answer:
-            "Because I love the Korean language, and I want to share my knowledge with others. Also, I want to improve my Korean skills and have more experience.\n\nThis job can also help me earn money and meet new people.",
+            "Because I love Korean language. I want to help others learn it and earn money.",
         },
         {
           question: "What should you do to be successful with it?",
           answer:
-            "To be successful, I need to:\n• Practice Korean every day\n• Be patient with students\n• Learn from my teachers\n• Keep improving my skills\n• Love teaching and helping others",
+            "I need to study Korean every day. I must be patient and keep learning. I should love teaching.",
         },
       ],
     },
