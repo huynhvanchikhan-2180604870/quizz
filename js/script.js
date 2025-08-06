@@ -9,6 +9,7 @@ class QuizApp {
     this.writingTopics = [];
     this.listeningTests = [];
     this.questions = []; // Câu hỏi của bài đang chọn
+    this.readingTests = [];
     this.currentQuestionIndex = 0;
     this.userAnswers = [];
     this.currentScore = 0;
@@ -30,7 +31,7 @@ class QuizApp {
       this.writingTopics = writingData.topics;
       this.listeningTests = listeningData.tests;
       this.clozeTests = clozeData.tests; // Thêm dòng này
-
+      this.readingTests = readingData.tests;
       this.showScreen("exerciseTypeScreen");
       this.hideHeaderAndProgress();
       document.querySelector(".container").classList.add("hide-quiz-info");
@@ -130,6 +131,9 @@ class QuizApp {
     if (type === "grammar") {
       this.allQuestions = this.grammarQuestions;
       this.setupGrammarLessons();
+    } else if (type === "reading") {
+      this.allQuestions = this.readingTests;
+      this.setupReadingTests();
     } else if (type === "transformation") {
       this.allQuestions = this.sentenceQuestions;
       this.setupTransformationLessons();
@@ -152,6 +156,68 @@ class QuizApp {
     this.showScreen("lessonSelectScreen");
   }
 
+  setupReadingTests() {
+    const lessonGrid = document.getElementById("lessonGrid");
+    const lessonTitle = document.getElementById("lessonTitle");
+
+    lessonTitle.textContent = "📖 Reading Passage - Chọn bài test";
+    lessonGrid.innerHTML = "";
+
+    this.readingTests.forEach((test) => {
+      const lessonBtn = document.createElement("button");
+      lessonBtn.className = "lesson-btn";
+      lessonBtn.onclick = () => this.selectReadingTest(test.id);
+      lessonBtn.innerHTML = `
+      <span class="lesson-number">${test.icon} Text ${test.id}</span>
+      <span class="lesson-range">${test.questions.length} câu hỏi</span>
+    `;
+      lessonGrid.appendChild(lessonBtn);
+    });
+  }
+
+  selectReadingTest(testId) {
+    const test = this.readingTests.find((t) => t.id === testId);
+    if (!test) return;
+
+    this.questions = test.questions;
+    this.currentTest = test;
+    this.currentExerciseType = "reading";
+
+    document.querySelector(
+      ".header-content h1"
+    ).textContent = `📖 ${test.title}`;
+    document.getElementById(
+      "welcomeText"
+    ).innerHTML = `Bạn sẽ đọc đoạn văn và trả lời ${test.questions.length} câu hỏi trắc nghiệm.<br>Đọc kỹ đoạn văn trước khi chọn đáp án.`;
+
+    this.showHeaderAndProgress();
+    this.showScreen("startScreen");
+
+    this.currentQuestionIndex = 0;
+    this.userAnswers = new Array(this.questions.length).fill(null);
+    this.currentScore = 0;
+    this.isAnswered = false;
+
+    this.updateTotalQuestions();
+    document.getElementById("elapsedTime").textContent = "00:00";
+    document.getElementById("currentScore").textContent = "0";
+  }
+
+  loadReadingQuestion(question) {
+    const questionText = document.getElementById("questionText");
+
+    const passageHtml = `
+    <div class="reading-passage">
+      <h4>📄 Đoạn văn:</h4>
+      <div class="passage-content">${this.currentTest.passage}</div>
+    </div>
+  `;
+
+    questionText.innerHTML =
+      passageHtml +
+      `<div class="question-text-content">${question.question}</div>`;
+    this.createOptions(question);
+  }
   setupListeningTests() {
     const lessonGrid = document.getElementById("lessonGrid");
     const lessonTitle = document.getElementById("lessonTitle");
@@ -926,6 +992,8 @@ class QuizApp {
         }
       } else if (this.currentExerciseType === "grammar") {
         this.loadGrammarQuestion(question);
+      } else if (this.currentExerciseType === "reading") {
+        this.loadReadingQuestion(question);
       } else {
         this.loadTransformationQuestion(question);
       }
@@ -937,6 +1005,70 @@ class QuizApp {
       questionScreen.style.opacity = "1";
       questionScreen.style.transform = "translateY(0)";
     }, 150);
+  }
+  createReadingReview(question, index, userAnswer, isCorrect) {
+    const hasAnswer = userAnswer !== null && userAnswer !== undefined;
+    const userAnswerText = hasAnswer
+      ? question.options[userAnswer]
+      : "(Chưa trả lời)";
+    const correctAnswerText = question.options[question.correct];
+
+    return `
+    <div class="review-question">
+      <strong>Câu ${index + 1}:</strong> ${question.question}
+    </div>
+    <div class="review-options">
+      ${question.options
+        .map((option, optIndex) => {
+          let className = "review-option";
+          let icon = "";
+
+          if (optIndex === question.correct) {
+            className += " correct-answer";
+            icon = "✅ ";
+          }
+          if (hasAnswer && optIndex === userAnswer) {
+            if (userAnswer === question.correct) {
+              className += " user-correct";
+            } else {
+              className += " user-answer";
+              icon = "❌ ";
+            }
+          }
+
+          return `
+          <div class="${className}">
+            <strong>${String.fromCharCode(65 + optIndex)}.</strong>
+            ${icon}${option}
+          </div>
+        `;
+        })
+        .join("")}
+    </div>
+    <div class="review-result ${isCorrect ? "correct" : "incorrect"}">
+      ${hasAnswer ? (isCorrect ? "✅ Đúng" : "❌ Sai") : "⚪ Chưa trả lời"}
+    </div>
+    <div class="review-feedback">
+      ${
+        question.explanation
+          ? `
+        <div class="review-explanation">
+          <strong>💡 Giải thích:</strong> ${question.explanation}
+        </div>
+      `
+          : ""
+      }
+      ${
+        question.tip
+          ? `
+        <div class="review-tip">
+          <strong>✨ Mẹo:</strong> ${question.tip}
+        </div>
+      `
+          : ""
+      }
+    </div>
+  `;
   }
 
   loadListeningQuestion(question) {
@@ -1570,7 +1702,8 @@ class QuizApp {
 
       if (
         this.currentExerciseType === "grammar" ||
-        this.currentExerciseType === "cloze"
+        this.currentExerciseType === "cloze" ||
+        this.currentExerciseType === "reading"
       ) {
         isCorrect = userAnswer === question.correct;
       } else if (this.currentExerciseType === "transformation") {
@@ -1691,7 +1824,8 @@ class QuizApp {
         if (
           this.currentExerciseType === "grammar" ||
           this.currentExerciseType === "listening" ||
-          this.currentExerciseType === "cloze"
+          this.currentExerciseType === "cloze" ||
+          this.currentExerciseType === "reading"
         ) {
           isCorrect = answer === question.correct;
         } else {
@@ -1871,7 +2005,14 @@ class QuizApp {
       }`;
 
       // Kiểm tra format để tạo review phù hợp
-      if (this.currentExerciseType === "cloze") {
+      if (this.currentExerciseType === "reading") {
+        reviewItem.innerHTML = this.createReadingReview(
+          question,
+          index,
+          userAnswer,
+          isCorrect
+        );
+      } else if (this.currentExerciseType === "cloze") {
         reviewItem.innerHTML = this.createClozeReview(
           question,
           index,
