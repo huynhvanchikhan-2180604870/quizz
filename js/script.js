@@ -904,11 +904,26 @@ class QuizApp {
         this.currentQuestionIndex + 1
       }/${this.questions.length}`;
 
+      // Tạo audio player một lần duy nhất cho listening
+      if (
+        this.currentExerciseType === "listening" &&
+        this.currentQuestionIndex === 0
+      ) {
+        this.createAudioPlayer();
+      }
+
       // Load question based on type
       if (this.currentExerciseType === "cloze") {
         this.loadClozeQuestion(question);
       } else if (this.currentExerciseType === "listening") {
-        // existing listening logic...
+        // Gọi đúng method cho listening
+        if (this.currentTest.format === "fill_in_blanks") {
+          this.loadFillInBlanksQuestion(question);
+        } else if (this.currentTest.format === "true_false") {
+          this.loadTrueFalseQuestion(question);
+        } else {
+          this.loadListeningQuestion(question);
+        }
       } else if (this.currentExerciseType === "grammar") {
         this.loadGrammarQuestion(question);
       } else {
@@ -1608,7 +1623,11 @@ class QuizApp {
     const autoNextCheckbox = document.getElementById("autoNextCheckbox");
 
     // Ẩn tất cả nút điều hướng cho Test 17
-    if (this.currentTest && this.currentTest.id === 17 && this.currentExerciseType === "listening") {
+    if (
+      this.currentTest &&
+      this.currentTest.id === 17 &&
+      this.currentExerciseType === "listening"
+    ) {
       prevBtn.style.display = "none";
       nextBtn.style.display = "none";
       finishBtn.style.display = "none";
